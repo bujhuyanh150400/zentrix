@@ -2,6 +2,8 @@ export const APP_NAME = 'ZENTRIX'
 
 export const CELL_PIN_INPUT = 6
 
+export const MAXIMUM_ERROR_ENTER_PIN = 5
+
 export const WS_URL = 'ws://116.118.60.103:5001'; // Thay bằng IP backend thật
 
 export const BACKEND_API_URL = 'http://116.118.60.103/api'

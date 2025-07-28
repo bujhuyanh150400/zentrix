@@ -1,8 +1,11 @@
-import useAuthStore from "@/services/auth/store";
+import {useAuthStore} from "@/services/auth/store";
 import {useEffect} from "react";
 import {_AuthStatus} from "@/services/auth/@type";
-import {router} from "expo-router";
+import {router, Stack} from "expo-router";
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {FocusAwareStatusBar} from "@/hooks/FocusAwareStatusBar";
+import {View} from "react-native";
+import DefaultColor from "@/components/ui/DefaultColor";
 
 
 export default function AuthLayout() {
@@ -16,6 +19,43 @@ export default function AuthLayout() {
 
     return (
         <SafeAreaProvider>
+            <FocusAwareStatusBar hidden/>
+            <Stack>
+                <Stack.Screen name="index" options={{headerShown: false}}/>
+
+                <Stack.Screen
+                    name="login"
+                    options={{
+                        title: 'Đăng nhập',
+                        headerTintColor: DefaultColor.black,
+                        headerBackButtonDisplayMode: "minimal",
+                        headerBackground: () => <View style={{backgroundColor: "transparent"}}></View>,
+                    }}/>
+                <Stack.Screen name="login/pin" options={{headerShown: false}}/>
+                <Stack.Screen name="login/verify" options={{headerShown: false}}/>
+
+                <Stack.Screen
+                    name="register"
+                    options={{
+                        title: 'Đăng ký',
+                        headerTintColor: DefaultColor.black,
+                        headerBackButtonDisplayMode: "minimal",
+                        headerBackground: () => <View style={{backgroundColor: "transparent"}}></View>,
+                    }}/>
+                <Stack.Screen name="register/success" options={{headerShown: false}}/>
+
+                <Stack.Screen
+                    name="forgot_pass"
+                    options={{
+                        title: 'Quên mật khẩu',
+                        headerTintColor: DefaultColor.black,
+                        headerBackButtonDisplayMode: "minimal",
+                        headerBackground: () => <View style={{backgroundColor: "transparent"}}></View>,
+                    }}
+                />
+                <Stack.Screen name="verifyCodeForgotPass" options={{headerShown: false}}/>
+
+            </Stack>
 
         </SafeAreaProvider>
     )

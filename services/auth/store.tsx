@@ -15,7 +15,7 @@ export interface IAuthState {
     unVerify: () => void;
 }
 
-const useAuthStore = create<IAuthState>((set, get) => ({
+export const useAuthStore = create<IAuthState>((set, get) => ({
     status: _AuthStatus.UNAUTHORIZED,
     auth_data: null,
     pin_code: null,
@@ -78,4 +78,25 @@ const useAuthStore = create<IAuthState>((set, get) => ({
         set({status: _AuthStatus.NEED_ACCESS_PIN})
     }
 }));
-export default useAuthStore
+
+
+export interface IForgotPassStorage {
+    email: string | null,
+    code: string | null,
+
+    setEmail: (email: string) => void,
+    setCode: (code: string) => void,
+    setEmpty: () => void,
+}
+
+export const useForgotPassStore = create<IForgotPassStorage>((set, get) => ({
+    email: null,
+    code: null,
+    setEmail: (email: string) => {
+        set({email});
+    },
+    setCode: (code: string) => {
+        set({code});
+    },
+    setEmpty: () => set({email: null, code: null}),
+}));

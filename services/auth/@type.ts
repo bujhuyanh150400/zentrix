@@ -65,7 +65,9 @@ export type RegisterRequest = {
     email: string;
     password: string;
 }
-
+export type FormRegisterType = RegisterRequest & {
+    confirm_password: string
+}
 /**
  * Forgot password
  */
