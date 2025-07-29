@@ -5,7 +5,7 @@ import {
     FormRegisterType,
     LoginRequest,
     LoginResponse,
-    RegisterRequest
+    RegisterRequest, ResetPasswordFormType, ResetPasswordRequest, VerifyCodeRequest
 } from "@/services/auth/@type";
 import {router} from "expo-router";
 import {useForm} from "react-hook-form";
@@ -87,4 +87,35 @@ export const useMutationForgotPassword = ({onSuccess,onError}: {
     mutationFn: (data: ForgotPasswordRequest) => authAPI.forgotPassword(data),
     onSuccess,
     onError
+});
+
+export const useMutationVerifyForgotPassword = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: VerifyCodeRequest) => authAPI.verifyCode(data),
+    onSuccess,
+    onError
+});
+
+
+export const useFormResetPassword = () => useForm<ResetPasswordFormType>({
+    resolver: yupResolver(
+        yup.object({
+            password: yup.string().min(8, 'Mật khẩu ít nhất 8 ký tự').required('Mật khẩu là bắt buộc'),
+            password_confirmation: yup.string()
+                .oneOf([yup.ref('password')], 'Mật khẩu xác nhận không khớp')
+                .required('Xác nhận mật khẩu là bắt buộc'),
+        })
+    ),
 })
+
+export const useMutationResetPassword = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: ResetPasswordRequest) => authAPI.resetPassword(data),
+    onSuccess,
+    onError
+});
+

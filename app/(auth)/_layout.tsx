@@ -53,7 +53,10 @@ export default function AuthLayout() {
                         headerBackground: () => <View style={{backgroundColor: "transparent"}}></View>,
                     }}
                 />
-                <Stack.Screen name="verifyCodeForgotPass" options={{headerShown: false}}/>
+                <Stack.Screen name="forgot_pass/verify" options={{headerShown: false}}/>
+
+                <Stack.Screen name="reset_pass" options={{headerShown: false}}/>
+                <Stack.Screen name="reset_pass/success" options={{headerShown: false}}/>
 
             </Stack>
 

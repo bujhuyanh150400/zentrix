@@ -1,3 +1,5 @@
+import {useForm} from "react-hook-form";
+
 /**
  * Verify user status types
  */
@@ -109,3 +111,5 @@ export interface VerifyUserRequest {
     cccd_front_image: File;
     cccd_back_image: File;
 }
+
+export type ResetPasswordFormType = Pick<ResetPasswordRequest, 'password' | 'password_confirmation'>
