@@ -1,5 +1,23 @@
 import {Symbol} from "@/services/assest_trading/@types";
 
+/**
+ * Time frame types
+ */
+export enum _Timeframe {
+    OneMinute = '1min',
+    FiveMinute = '5min',
+    FifteenMinutes = '15min',
+    ThirtyMinutes = '30min',
+    FortyFiveMinutes = '45min',
+    OneHour = '1h',
+    OneDay = '1day',
+    OneWeek = '1week',
+}
+export enum _TypeChart {
+    CANDLE = "CANDLE",
+    LINE = "LINE",
+}
+
 export enum _TransactionStatus {
     OPEN = 1,
     CLOSED = 2,
@@ -90,3 +108,13 @@ export type CalculateTransactionPrices = Transaction & {
     entry_volume_price?: number;
     realtime_volume_price?: number;
 }
+
+export const TIME_FRAME_SELECT = [
+    {label: '1 phút', unit: "1m", value: _Timeframe.OneMinute},
+    {label: '5 phút', unit: "5m", value: _Timeframe.FiveMinute},
+    {label: '30 phút', unit: "30m", value: _Timeframe.ThirtyMinutes},
+    {label: '45 phút', unit: "45m", value: _Timeframe.FortyFiveMinutes},
+    {label: '1 giờ', unit: "1h", value: _Timeframe.OneHour},
+    {label: '1 ngày', unit: "1d", value: _Timeframe.OneDay},
+    {label: '1 tuần', unit: "1w", value: _Timeframe.OneWeek},
+];

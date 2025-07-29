@@ -3,6 +3,7 @@ import {
     _AuthStatus,
     ForgotPasswordRequest,
     FormRegisterType,
+    FormVerifyAccountStepOne,
     LoginRequest,
     LoginResponse,
     RegisterRequest, ResetPasswordFormType, ResetPasswordRequest, VerifyCodeRequest
@@ -18,7 +19,7 @@ export const checkLogin = async (hydrate: IAuthState['hydrate']) => {
     await hydrate()
     const freshStatus = useAuthStore.getState().status
     if (freshStatus === _AuthStatus.NEED_ACCESS_PIN) {
-        router.replace('/(auth)/verify');
+        router.replace('/(auth)/login/verify');
     } else {
         router.replace('/(auth)');
     }
@@ -119,3 +120,50 @@ export const useMutationResetPassword = ({onSuccess,onError}: {
     onError
 });
 
+export const useFormVerifyAccountStepOne = () => useForm<FormVerifyAccountStepOne>({
+    resolver: yupResolver(
+        yup.object({
+            first_name: yup
+                .string()
+                .required("Họ là bắt buộc.")
+                .max(255, "Họ không được vượt quá 255 ký tự."),
+            last_name: yup
+                .string()
+                .required("Tên là bắt buộc.")
+                .max(255, "Tên không được vượt quá 255 ký tự."),
+            dob: yup
+                .string()
+                .required("Ngày sinh là bắt buộc.")
+                .matches(
+                    /^\d{4}-\d{2}-\d{2}$/,
+                    "Ngày sinh phải có định dạng YYYY-MM-DD"
+                ),
+            gender: yup
+                .mixed<"male" | "female" | "other">()
+                .oneOf(["male", "female", "other"], "Giới tính không hợp lệ")
+                .required("Giới tính là bắt buộc."),
+            phone_number: yup
+                .string()
+                .required("Số điện thoại là bắt buộc.")
+                .max(20, "Số điện thoại không được vượt quá 20 ký tự."),
+            bin_bank: yup.string().required("Vui lòng chọn ngân hàng"),
+            account_bank: yup.string().required("Số tài khoản không được để trống"),
+            account_bank_name: yup
+                .string()
+                .required("Tên chủ tài khoản không được để trống"),
+            address: yup
+                .string()
+                .required("Địa chỉ là bắt buộc.")
+                .max(500, "Địa chỉ không được vượt quá 500 ký tự."),
+        })
+    ),
+});
+
+export const useMutationVerifyAccount = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: FormData) => authAPI.verifyAccount(data),
+    onSuccess,
+    onError
+});

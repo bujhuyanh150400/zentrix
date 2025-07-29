@@ -1,5 +1,5 @@
 import secureStorage from "@/libs/storage/secureStorage";
-import {_AuthStatus, LoginResponse, UserLogin} from "@/services/auth/@type";
+import {_AuthStatus, FormVerifyAccountStepOne, LoginResponse, UserLogin} from "@/services/auth/@type";
 import {SECURE_AUTH_TOKEN, SECURE_PIN_CODE} from "@/libs/storage/key";
 import {create} from 'zustand';
 
@@ -99,4 +99,16 @@ export const useForgotPassStore = create<IForgotPassStorage>((set, get) => ({
         set({code});
     },
     setEmpty: () => set({email: null, code: null}),
+}));
+
+interface IVerifyAccountUserStore {
+    form_step_1: FormVerifyAccountStepOne | null,
+    setStepOne: (data: FormVerifyAccountStepOne) => void,
+    clearStepOne: () => void,
+}
+
+export const useVerifyAccountUserStore = create<IVerifyAccountUserStore>((set,get) => ({
+    form_step_1: null,
+    setStepOne: (data) => set({form_step_1: data}),
+    clearStepOne: () => set({form_step_1: null}),
 }));

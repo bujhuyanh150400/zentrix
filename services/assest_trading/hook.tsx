@@ -1,8 +1,13 @@
 import {useContext, useEffect, useRef} from "react";
 import {WebSocketContext} from "@/services/app/socketProvider";
 import {useSubscribeSymbolStore} from "@/services/assest_trading/store";
-import {_AssetType} from "@/services/assest_trading/@types";
-import {useQuery} from "@tanstack/react-query";
+import {
+    _AssetType,
+    AddFavoriteSymbolsRequest,
+    DeletedFavoriteSymbolsRequest,
+    SearchSymbolRequest
+} from "@/services/assest_trading/@types";
+import {useInfiniteQuery, useMutation, useQuery} from "@tanstack/react-query";
 import assetTradingAPI from "@/services/assest_trading/api";
 
 
@@ -65,9 +70,60 @@ export const useSubscribeSymbols = (symbols: string[], userId?: number, secret?:
     }, [updatePrice, ws]);
 }
 
-
 export const useQueryListAssetTrading = (activeTab: _AssetType) => useQuery({
     queryKey: ['assetTradingAPI-list', activeTab],
     queryFn: async () => assetTradingAPI.list({type: activeTab}),
     enabled: false,
 });
+
+export const useQueryFavoriteSymbolQuery = () => useQuery({
+    queryKey: ['assetTradingAPI-getFavoriteSymbols'],
+    queryFn: assetTradingAPI.getFavoriteSymbols,
+});
+
+export const useMutationDeletedFavoriteSymbol = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: DeletedFavoriteSymbolsRequest) => assetTradingAPI.deletedFavoriteSymbols(data),
+    onSuccess,
+    onError
+});
+
+export const useMutationAddFavoriteSymbol = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: AddFavoriteSymbolsRequest) => assetTradingAPI.addFavoriteSymbolsRequest(data),
+    onSuccess,
+    onError
+});
+
+export const useInfiniteSearchSymbol = (queryParams: SearchSymbolRequest = {}) => {
+    return useInfiniteQuery({
+        queryKey: ['assetTradingAPI-searchSymbol', queryParams],
+        queryFn: ({pageParam = 1}) => {
+            return assetTradingAPI.searchSymbol({
+                ...queryParams,
+                page: pageParam,
+            });
+        },
+        getNextPageParam: (lastPage) => {
+            const next = lastPage.meta.current_page + 1;
+            return next <= lastPage.meta.last_page ? next : undefined;
+        },
+        initialPageParam: 1,
+    });
+};
+
+export const useQueryItemSymbol= (symbol?:string) => useQuery({
+    queryKey: ['assetTradingAPI-item', symbol],
+    enabled: !!symbol,
+    queryFn: async () => {
+        return await assetTradingAPI.item({
+            symbol: symbol || '',
+        });
+    },
+    select: (res) => res.data
+})
+

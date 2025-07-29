@@ -1,6 +1,6 @@
 import {useAssets} from "expo-asset";
 import {useVideoPlayer, VideoView} from "expo-video";
-import {StyleSheet, View} from "react-native";
+import {StyleSheet, View, Text} from "react-native";
 import {APP_NAME} from "@/libs/constant_env";
 import {Link} from "expo-router";
 import {TouchableOpacity} from "@gorhom/bottom-sheet";
@@ -29,8 +29,8 @@ export default function OnboardScreen() {
                 />
             )}
             <View style={{ marginTop: 80, padding: 20 }}>
-                <Paragraph style={styles.app_name}>{APP_NAME}</Paragraph>
-                <Paragraph style={styles.header}>Sẵn sàng để thay đổi cách bạn kiếm tiền?</Paragraph>
+                <Text style={styles.app_name}>{APP_NAME}</Text>
+                <Text style={styles.header}>Sẵn sàng để thay đổi cách bạn kiếm tiền?</Text>
             </View>
             <View style={styles.buttons}>
                 <Link
@@ -40,7 +40,7 @@ export default function OnboardScreen() {
                     }]}
                     asChild>
                     <TouchableOpacity>
-                        <Paragraph style={{ color: 'white', fontSize: 18, fontWeight: '500' }}>Đăng nhập</Paragraph>
+                        <Text style={{ color: 'white', fontSize: 18, fontWeight: '500' }}>Đăng nhập</Text>
                     </TouchableOpacity>
                 </Link>
                 <Link
@@ -48,7 +48,7 @@ export default function OnboardScreen() {
                     style={[styles.button, { backgroundColor: '#fff' }]}
                     asChild>
                     <TouchableOpacity>
-                        <Paragraph style={{ fontSize: sizeDefault["lg"], fontWeight: 500 }}>Đăng ký</Paragraph>
+                        <Text style={{ fontSize: sizeDefault["lg"], fontWeight: 500 }}>Đăng ký</Text>
                     </TouchableOpacity>
                 </Link>
             </View>
@@ -68,14 +68,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
     },
     app_name: {
-        fontSize: sizeDefault["4xl"],
+        fontSize: sizeDefault["3xl"],
         fontWeight: '900',
         textTransform: 'uppercase',
         color: 'white',
         marginBottom: 20
     },
     header: {
-        fontSize: sizeDefault["5xl"],
+        fontSize: sizeDefault["4xl"],
         fontWeight: '900',
         textTransform: 'uppercase',
         color: 'white',

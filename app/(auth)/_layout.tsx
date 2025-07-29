@@ -24,7 +24,7 @@ export default function AuthLayout() {
                 <Stack.Screen name="index" options={{headerShown: false}}/>
 
                 <Stack.Screen
-                    name="login"
+                    name="login/index"
                     options={{
                         title: 'Đăng nhập',
                         headerTintColor: DefaultColor.black,
@@ -35,7 +35,7 @@ export default function AuthLayout() {
                 <Stack.Screen name="login/verify" options={{headerShown: false}}/>
 
                 <Stack.Screen
-                    name="register"
+                    name="register/index"
                     options={{
                         title: 'Đăng ký',
                         headerTintColor: DefaultColor.black,

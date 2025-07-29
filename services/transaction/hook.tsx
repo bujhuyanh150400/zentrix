@@ -1,6 +1,6 @@
 import {
     _TransactionStatus,
-    CalculateTransactionPrices,
+    CalculateTransactionPrices, StoreTransactionRequestType,
     Transaction, TransactionCancelRequestType, TransactionClosedRequestType,
     TransactionHistoryRequestType, TransactionOpenNowRequestType
 } from "@/services/transaction/@types";
@@ -134,6 +134,15 @@ export const useMutationCanceledTrans = ({onSuccess,onError}: {
     onError: (error: any) => void;
 }) => useMutation({
     mutationFn: (data: TransactionCancelRequestType) => transactionAPI.cancel(data),
+    onSuccess,
+    onError,
+})
+
+export const useMutationStoreTrans = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: StoreTransactionRequestType) => transactionAPI.store(data),
     onSuccess,
     onError,
 })

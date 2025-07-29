@@ -7,7 +7,7 @@ import {APP_NAME} from "@/libs/constant_env";
 export default function SplashedScreen() {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.5)).current;
-    const {hydrate} = useAuthStore();
+    const {hydrate, logout} = useAuthStore();
 
     useEffect(() => {
         // animate the fade-in and scale-up effect

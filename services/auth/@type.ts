@@ -113,3 +113,5 @@ export interface VerifyUserRequest {
 }
 
 export type ResetPasswordFormType = Pick<ResetPasswordRequest, 'password' | 'password_confirmation'>
+
+export type FormVerifyAccountStepOne = Omit<VerifyUserRequest, 'cccd_front_image' | 'cccd_back_image'>;
