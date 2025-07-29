@@ -1,9 +1,11 @@
 import SuccessView from "@/components/SuccessView";
 import {router} from "expo-router";
+import useDisableBackGesture from "@/hooks/useDisableBackGesture";
 
 
 export default function ResetPasswordSuccessScreen() {
-
+    // chặn hành vi vuốt về
+    useDisableBackGesture();
     return (
         <SuccessView
             title="Thay mật khẩu thành công!"

@@ -13,6 +13,7 @@ import {showMessage} from "react-native-flash-message";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {Button, Circle, H6, YStack} from "tamagui";
 import {AntDesign} from "@expo/vector-icons";
+import {useHeaderHeight} from "@react-navigation/elements";
 
 
 export default function EnterPinScreen() {
@@ -91,7 +92,7 @@ export default function EnterPinScreen() {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{flex: 1}}
-                keyboardVerticalOffset={64}
+                keyboardVerticalOffset={useHeaderHeight()}
             >
                 <View style={{
                     flex: 1,

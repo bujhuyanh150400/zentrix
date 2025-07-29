@@ -10,6 +10,8 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {KeyboardAvoidingView, Platform, View, Text, TextInput as RNTextInput} from "react-native";
 import {H6, Paragraph, Spinner, YStack} from "tamagui";
 import {pinStyles} from "@/components/ui/DefaultStyle";
+import {useHeaderHeight} from "@react-navigation/elements";
+import DefaultColor from "@/components/ui/DefaultColor";
 
 
 export default function VerifyCodeForgotPassScreen() {
@@ -56,11 +58,11 @@ export default function VerifyCodeForgotPassScreen() {
 
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: "#fff"}} edges={['top', 'bottom']}>
+        <SafeAreaView style={{flex: 1, backgroundColor: DefaultColor.white}} edges={['top', 'bottom']}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{flex: 1}}
-                keyboardVerticalOffset={64}
+                keyboardVerticalOffset={useHeaderHeight()}
             >
                 <View
                       style={{flex: 1, alignItems: 'center', justifyContent: "center"}}>

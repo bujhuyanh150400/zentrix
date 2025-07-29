@@ -1,5 +1,5 @@
 import {Symbol} from "@/services/assest_trading/@types";
-import {Dispatch, FC, SetStateAction, useEffect, useState} from "react";
+import {Dispatch, FC, SetStateAction, useEffect, useRef, useState} from "react";
 import {
     _TradeType,
     _TransactionStatus,
@@ -15,11 +15,11 @@ import {useShowErrorHandler} from "@/hooks/useHandleError";
 import {calculateProfit, formatNumber, parseToNumber} from "@/libs/utils";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View} from "react-native";
-import {Button, Paragraph, Sheet, XStack, YStack} from "tamagui";
+import {Button, Paragraph,  XStack, YStack} from "tamagui";
 import {MaterialIcons} from '@expo/vector-icons';
 import DefaultColor from "@/components/ui/DefaultColor";
 import HorizontalTabBar from "@/components/HorizontalTabBar";
-
+import BottomSheet, {BottomSheetBackdrop, BottomSheetView} from '@gorhom/bottom-sheet';
 
 const SNAP_CLOSE = 35;
 const SNAP_OPEN = 70;
@@ -34,6 +34,9 @@ type TransactionSheetProps = {
     symbol?: Symbol,
 }
 const TransactionSheet: FC<TransactionSheetProps> = (props) => {
+    // ref
+    const bottomSheetRef = useRef<BottomSheet>(null);
+
     const [snapPoint, setSnapPoint] = useState(SNAP_CLOSE);
     const [openMore, setOpenMore] = useState<boolean>(false);
     const [tab, setTab] = useState<_TransactionTriggerType>(_TransactionTriggerType.TYPE_TRIGGER_AUTO_TRIGGER);
@@ -83,7 +86,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
             useShowErrorHandler(error);
         }
     })
-    
+
     useEffect(() => {
         if (parseToNumber(form.volume) < 0) {
             setError({volume: "Khối lượng không được nhỏ hơn 0.01", isError: true});
@@ -108,7 +111,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                 }
             }
         }
-    }, [form, setError]);
+    }, [form]);
 
     useEffect(() => {
         if (form.trigger_price) {
@@ -126,7 +129,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                 }
             }
         }
-    }, [props.price, form.trigger_price, form.type_trigger, setError]);
+    }, [props.price, form.trigger_price, form.type_trigger]);
 
     useEffect(() => {
         if (props.open) {
@@ -150,7 +153,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                 percent_stop_loss: "",
             })
         }
-    }, [props.symbol, props.account, props.open, props.tradeType, setForm]);
+    }, [props.symbol, props.account, props.open]);
 
     useEffect(() => {
         if (openMore) {
@@ -174,7 +177,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
             setForm({trigger_price: ""});
             setForm({type_trigger: _TransactionTriggerType.TYPE_TRIGGER_NOW});
         }
-    }, [openMore, props.price, setForm, tab]);
+    }, [openMore, tab]);
 
     useEffect(() => {
         const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
@@ -187,230 +190,247 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
     
     useEffect(() => {
         setLoading(isPending);
-    }, [isPending, setLoading]);
+    }, [isPending]);
+
+    useEffect(() => {
+        if (props.open) {
+            bottomSheetRef.current?.expand();
+        } else {
+            bottomSheetRef.current?.close();
+        }
+    }, [props.open]);
 
     return (
-        <Sheet
-            forceRemoveScrollEnabled={true}
-            modal={true}
-            open={props.open}
-            onOpenChange={props.setOpen}
+        <BottomSheet
+            index={-1}
+            containerStyle={{
+                zIndex: 100_000,
+            }}
+            ref={bottomSheetRef}
             snapPoints={[snapPoint]}
-            dismissOnSnapToBottom
-            zIndex={100_000}
-            animation={"manual"}
+            onClose={() => props.setOpen(false)}
+            handleComponent={() => null}
+            enablePanDownToClose={false}
+            enableContentPanningGesture={false}
+            enableHandlePanningGesture={false}
+            backdropComponent={(props) => (
+                <BottomSheetBackdrop
+                    {...props}
+                    disappearsOnIndex={-1}
+                    appearsOnIndex={0}
+                    opacity={0.5}
+                    pressBehavior="none"
+                />
+            )}
         >
-            <Sheet.Overlay
-                animation="lazy"
-                backgroundColor="$shadow6"
-                enterStyle={{opacity: 0}}
-                exitStyle={{opacity: 0}}
-            />
-            <Sheet.Handle/>
-            <KeyboardAwareScrollView
-                keyboardShouldPersistTaps="handled"
-                enableOnAndroid
-                showsVerticalScrollIndicator={false}
-                scrollEnabled={keyboardVisible}
-            >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <Sheet.Frame padding="$4" gap="$2">
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontSize={16} fontWeight={700}>Giao dịch</Paragraph>
-                            <TouchableOpacity
-                                style={[
-                                    styles.btn_round, {
-                                        backgroundColor: openMore ? DefaultColor.slate[300] : DefaultColor.slate[400],
-                                    }
-                                ]}
-                                onPress={() => {
-                                    setOpenMore(!openMore);
-                                }}
-                            >
-                                <MaterialIcons name="candlestick-chart" size={24} color={
-                                    openMore ? "white" : "black"
-                                }/>
-                            </TouchableOpacity>
-                        </XStack>
-                        <View>
-                            {!openMore ? (
-                                <YStack>
-                                    <Paragraph>Khối lượng</Paragraph>
-                                    <InputPlusMinus
-                                        value={form.volume}
-                                        reference={0.01}
-                                        onChange={(value) => setForm({volume: value})}
-                                        onFocus={() => setSnapPoint(SNAP_OPEN)}
-                                        onBlur={() => {
-                                            const num = parseToNumber(form.volume);
-                                            setForm({volume: formatNumber(num)})
-                                            setSnapPoint(SNAP_CLOSE);
-                                        }}
-                                        pre={"Lô"}
-                                    />
-                                    {error?.volume && (
-                                        <Paragraph color="red">{error.trigger_price}</Paragraph>
-                                    )}
-                                </YStack>
-                            ) : (
-                                <>
-                                    <HorizontalTabBar<_TransactionTriggerType>
-                                        tabs={[
-                                            {
-                                                key: _TransactionTriggerType.TYPE_TRIGGER_AUTO_TRIGGER,
-                                                item: (isActive) => (
-                                                    <Paragraph
-                                                        style={{
-                                                            color: isActive ? DefaultColor.black : DefaultColor.slate[300],
-                                                            fontWeight: isActive ? 700 : 'normal'
-                                                        }}
-                                                    >
-                                                        Lệnh thị trường
-                                                    </Paragraph>
-                                                ),
-                                            },
-                                            {
-                                                key: _TransactionTriggerType.TYPE_TRIGGER_LOW_BUY,
-                                                item: (isActive) => (
-                                                    <Paragraph
-                                                        style={{
-                                                            color: isActive ? DefaultColor.black : DefaultColor.slate[300],
-                                                            fontWeight: isActive ? 700 : 'normal'
-                                                        }}
-                                                    >
-                                                        Chờ mua giá thấp
-                                                    </Paragraph>
-                                                ),
-                                            },
-                                            {
-                                                key: _TransactionTriggerType.TYPE_TRIGGER_HIGH_BUY,
-                                                item: (isActive) => (
-                                                    <Paragraph
-                                                        style={{
-                                                            color: isActive ? DefaultColor.black : DefaultColor.slate[300],
-                                                            fontWeight: isActive ? 700 : 'normal'
-                                                        }}
-                                                    >
-                                                        Chờ mua giá cao
-                                                    </Paragraph>
-                                                ),
-                                            },
-                                        ]}
-                                        activeKey={tab}
-                                        onTabPress={setTab}
-                                        styleContainer={{
-                                            marginBottom: 20
-                                        }}
-                                    />
+            <BottomSheetView>
+                <KeyboardAwareScrollView
+                    keyboardShouldPersistTaps="handled"
+                    enableOnAndroid
+                    showsVerticalScrollIndicator={false}
+                    scrollEnabled={keyboardVisible}
+                >
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <YStack padding="$4" gap="$2">
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontSize={16} fontWeight={700}>Giao dịch</Paragraph>
+                                <TouchableOpacity
+                                    style={[
+                                        styles.btn_round, {
+                                            backgroundColor: openMore ? DefaultColor.slate[300] : DefaultColor.slate[400],
+                                        }
+                                    ]}
+                                    onPress={() => {
+                                        setOpenMore(!openMore);
+                                    }}
+                                >
+                                    <MaterialIcons name="candlestick-chart" size={24} color={
+                                        openMore ? "white" : "black"
+                                    }/>
+                                </TouchableOpacity>
+                            </XStack>
+                            <View>
+                                {!openMore ? (
                                     <YStack>
-                                        <YStack gap={"$2"}>
-                                            <YStack>
-                                                <Paragraph>Khối lượng</Paragraph>
-                                                <InputPlusMinus
-                                                    value={form.volume}
-                                                    reference={0.01}
-                                                    onChange={(value) => setForm({volume: value})}
-                                                    pre={"Lô"}
-                                                />
-                                                {error?.volume && (
-                                                    <Paragraph color="red">{error.volume}</Paragraph>
-                                                )}
-                                            </YStack>
-
-                                            {(tab === _TransactionTriggerType.TYPE_TRIGGER_LOW_BUY
-                                                || tab === _TransactionTriggerType.TYPE_TRIGGER_HIGH_BUY) && (
+                                        <Paragraph>Khối lượng</Paragraph>
+                                        <InputPlusMinus
+                                            value={form.volume}
+                                            reference={0.01}
+                                            onChange={(value) => setForm({volume: value})}
+                                            onFocus={() => setSnapPoint(SNAP_OPEN)}
+                                            onBlur={() => {
+                                                const num = parseToNumber(form.volume);
+                                                setForm({volume: formatNumber(num)})
+                                                setSnapPoint(SNAP_CLOSE);
+                                            }}
+                                            pre={"Lô"}
+                                        />
+                                        {error?.volume && (
+                                            <Paragraph color="red">{error.trigger_price}</Paragraph>
+                                        )}
+                                    </YStack>
+                                ) : (
+                                    <>
+                                        <HorizontalTabBar<_TransactionTriggerType>
+                                            tabs={[
+                                                {
+                                                    key: _TransactionTriggerType.TYPE_TRIGGER_AUTO_TRIGGER,
+                                                    item: (isActive) => (
+                                                        <Paragraph
+                                                            style={{
+                                                                color: isActive ? DefaultColor.black : DefaultColor.slate[300],
+                                                                fontWeight: isActive ? 700 : 'normal'
+                                                            }}
+                                                        >
+                                                            Lệnh thị trường
+                                                        </Paragraph>
+                                                    ),
+                                                },
+                                                {
+                                                    key: _TransactionTriggerType.TYPE_TRIGGER_LOW_BUY,
+                                                    item: (isActive) => (
+                                                        <Paragraph
+                                                            style={{
+                                                                color: isActive ? DefaultColor.black : DefaultColor.slate[300],
+                                                                fontWeight: isActive ? 700 : 'normal'
+                                                            }}
+                                                        >
+                                                            Chờ mua giá thấp
+                                                        </Paragraph>
+                                                    ),
+                                                },
+                                                {
+                                                    key: _TransactionTriggerType.TYPE_TRIGGER_HIGH_BUY,
+                                                    item: (isActive) => (
+                                                        <Paragraph
+                                                            style={{
+                                                                color: isActive ? DefaultColor.black : DefaultColor.slate[300],
+                                                                fontWeight: isActive ? 700 : 'normal'
+                                                            }}
+                                                        >
+                                                            Chờ mua giá cao
+                                                        </Paragraph>
+                                                    ),
+                                                },
+                                            ]}
+                                            activeKey={tab}
+                                            onTabPress={setTab}
+                                            styleContainer={{
+                                                marginBottom: 20
+                                            }}
+                                        />
+                                        <YStack>
+                                            <YStack gap={"$2"}>
                                                 <YStack>
-                                                    <Paragraph>Giá chốt</Paragraph>
+                                                    <Paragraph>Khối lượng</Paragraph>
                                                     <InputPlusMinus
-                                                        value={form.trigger_price || ""}
-                                                        reference={0.1}
-                                                        onChange={(value) => setForm({trigger_price: value})}
+                                                        value={form.volume}
+                                                        reference={0.01}
+                                                        onChange={(value) => setForm({volume: value})}
                                                         pre={"Lô"}
                                                     />
-                                                    {error?.trigger_price && (
-                                                        <Paragraph color="red">{error.trigger_price}</Paragraph>
+                                                    {error?.volume && (
+                                                        <Paragraph color="red">{error.volume}</Paragraph>
                                                     )}
                                                 </YStack>
-                                            )}
-                                            <YStack>
-                                                <Paragraph>Chốt lời</Paragraph>
-                                                <InputPlusMinus
-                                                    value={form.percent_take_profit || ""}
-                                                    reference={1}
-                                                    onChange={(value) => setForm({percent_take_profit: value})}
-                                                    pre={"+%"}
-                                                />
-                                                {(form.percent_take_profit && parseToNumber(form.percent_take_profit) > 0) && (
-                                                    <Paragraph color={DefaultColor.slate[500]}>
-                                                        Gía chốt
-                                                        lời:{calculateProfit(props.price, form.percent_take_profit, form.volume, "TP")}
-                                                    </Paragraph>
+
+                                                {(tab === _TransactionTriggerType.TYPE_TRIGGER_LOW_BUY
+                                                    || tab === _TransactionTriggerType.TYPE_TRIGGER_HIGH_BUY) && (
+                                                    <YStack>
+                                                        <Paragraph>Giá chốt</Paragraph>
+                                                        <InputPlusMinus
+                                                            value={form.trigger_price || ""}
+                                                            reference={0.1}
+                                                            onChange={(value) => setForm({trigger_price: value})}
+                                                            pre={"Lô"}
+                                                        />
+                                                        {error?.trigger_price && (
+                                                            <Paragraph color="red">{error.trigger_price}</Paragraph>
+                                                        )}
+                                                    </YStack>
                                                 )}
-                                                {error?.percent_take_profit && (
-                                                    <Paragraph color="red">{error.percent_take_profit}</Paragraph>
-                                                )}
-                                            </YStack>
-                                            <YStack>
-                                                <Paragraph>Cắt lỗ</Paragraph>
-                                                <InputPlusMinus
-                                                    value={form.percent_stop_loss || ""}
-                                                    reference={1}
-                                                    onChange={(value) => setForm({percent_stop_loss: value})}
-                                                    pre={"-%"}
-                                                />
-                                                {(form.percent_stop_loss && parseToNumber(form.percent_stop_loss) > 0) && (
-                                                    <Paragraph color={DefaultColor.slate[500]}>
-                                                        Gía cắt
-                                                        lỗ:{calculateProfit(props.price, form.percent_stop_loss, form.volume, "SL")}
-                                                    </Paragraph>
-                                                )}
-                                                {error?.percent_stop_loss && (
-                                                    <Paragraph color="red">{error.percent_stop_loss}</Paragraph>
-                                                )}
+                                                <YStack>
+                                                    <Paragraph>Chốt lời</Paragraph>
+                                                    <InputPlusMinus
+                                                        value={form.percent_take_profit || ""}
+                                                        reference={1}
+                                                        onChange={(value) => setForm({percent_take_profit: value})}
+                                                        pre={"+%"}
+                                                    />
+                                                    {(form.percent_take_profit && parseToNumber(form.percent_take_profit) > 0) && (
+                                                        <Paragraph color={DefaultColor.slate[500]}>
+                                                            Gía chốt
+                                                            lời:{calculateProfit(props.price, form.percent_take_profit, form.volume, "TP")}
+                                                        </Paragraph>
+                                                    )}
+                                                    {error?.percent_take_profit && (
+                                                        <Paragraph color="red">{error.percent_take_profit}</Paragraph>
+                                                    )}
+                                                </YStack>
+                                                <YStack>
+                                                    <Paragraph>Cắt lỗ</Paragraph>
+                                                    <InputPlusMinus
+                                                        value={form.percent_stop_loss || ""}
+                                                        reference={1}
+                                                        onChange={(value) => setForm({percent_stop_loss: value})}
+                                                        pre={"-%"}
+                                                    />
+                                                    {(form.percent_stop_loss && parseToNumber(form.percent_stop_loss) > 0) && (
+                                                        <Paragraph color={DefaultColor.slate[500]}>
+                                                            Gía cắt
+                                                            lỗ:{calculateProfit(props.price, form.percent_stop_loss, form.volume, "SL")}
+                                                        </Paragraph>
+                                                    )}
+                                                    {error?.percent_stop_loss && (
+                                                        <Paragraph color="red">{error.percent_stop_loss}</Paragraph>
+                                                    )}
+                                                </YStack>
                                             </YStack>
                                         </YStack>
+                                    </>
+                                )}
+                            </View>
+                            <XStack gap="$2" alignItems="center" marginTop={"$4"}>
+                                <Button onPress={() => props.setOpen(false)}>Hủy</Button>
+                                <Button
+                                    disabled={error.isError}
+                                    flex={1}
+                                    theme={props.tradeType === _TradeType.BUY ? "blue" : "red"}
+                                    backgroundColor={props.tradeType === _TradeType.BUY ?
+                                        (error.isError ? DefaultColor.blue[300] : DefaultColor.blue[500]) :
+                                        (error.isError ? DefaultColor.red[300] : DefaultColor.red[500])}
+                                    color="#fff"
+                                    fontWeight="bold"
+                                    onPress={() => {
+                                        const dataSubmit = {
+                                            account_id: form.account_id,
+                                            asset_trading_id: form.asset_trading_id,
+                                            type: form.type,
+                                            type_trigger: form.type_trigger,
+                                            volume: form.volume,
+                                            entry_price: props.price.toString(),
+                                            trigger_price: form.trigger_price,
+                                            percent_take_profit: form.percent_take_profit,
+                                            percent_stop_loss: form.percent_stop_loss,
+                                        }
+                                        mutate(dataSubmit)
+                                    }}
+                                >
+                                    <YStack alignItems="center" justifyContent="center">
+                                        <Paragraph theme="alt2" fontSize="$2" color="#fff">Xác
+                                            nhận {props.tradeType === _TradeType.BUY ? "Mua" : "Bán"} {form.volume} lô</Paragraph>
+                                        <Paragraph theme="alt2" fontSize="$5" fontWeight="500" color="#fff">
+                                            {props.price}
+                                        </Paragraph>
                                     </YStack>
-                                </>
-                            )}
-                        </View>
-                        <XStack gap="$2" alignItems="center" marginTop={"$4"}>
-                            <Button onPress={() => props.setOpen(false)}>Hủy</Button>
-                            <Button
-                                disabled={error.isError}
-                                flex={1} theme={props.tradeType === _TradeType.BUY ? "blue" : "red"}
-                                backgroundColor={props.tradeType === _TradeType.BUY ?
-                                    (error.isError ? DefaultColor.blue[300] : DefaultColor.blue[500]) :
-                                    (error.isError ? DefaultColor.blue[300] : DefaultColor.blue[500])}
-                                color="#fff"
-                                fontWeight="bold"
-                                onPress={() => {
-                                    const dataSubmit = {
-                                        account_id: form.account_id,
-                                        asset_trading_id: form.asset_trading_id,
-                                        type: form.type,
-                                        type_trigger: form.type_trigger,
-                                        volume: form.volume,
-                                        entry_price: props.price.toString(),
-                                        trigger_price: form.trigger_price,
-                                        percent_take_profit: form.percent_take_profit,
-                                        percent_stop_loss: form.percent_stop_loss,
-                                    }
-                                    mutate(dataSubmit)
-                                }}
-                            >
-                                <YStack alignItems="center" justifyContent="center">
-                                    <Paragraph theme="alt2" fontSize="$2" color="#fff">Xác
-                                        nhận {props.tradeType === _TradeType.BUY ? "Mua" : "Bán"} {form.volume} lô</Paragraph>
-                                    <Paragraph theme="alt2" fontSize="$5" fontWeight="500" color="#fff">
-                                        {props.price}
-                                    </Paragraph>
-                                </YStack>
-                            </Button>
-                        </XStack>
-                    </Sheet.Frame>
-                </TouchableWithoutFeedback>
-            </KeyboardAwareScrollView>
-        </Sheet>
+                                </Button>
+                            </XStack>
+                        </YStack>
+                    </TouchableWithoutFeedback>
+                </KeyboardAwareScrollView>
+            </BottomSheetView>
+        </BottomSheet>
+
     )
 }
 

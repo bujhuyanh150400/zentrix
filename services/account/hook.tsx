@@ -27,13 +27,13 @@ export const useGetAccountActive = (): UseGetAccountActiveHookType => {
         if (!account) {
             query.refetch();
         }
-    }, [account, query]);
+    }, [account]);
 
     useEffect(() => {
         if (query.isSuccess && query.data) {
             setAccount(query.data.data);
         }
-    }, [query.data, query.isSuccess, setAccount]);
+    }, [query.data, query.isSuccess]);
 
     return {
         account,

@@ -21,11 +21,12 @@ export const useTransactionHistory = (params: TransactionHistoryRequestType) => 
         select: (res) => res.data,
     });
     const {data, setTransactions} = useTransactionHistoryStore();
+
     useEffect(() => {
         if (query.data) {
             setTransactions(params.status, query.data);
         }
-    }, [params.status, query.data, setTransactions]);
+    }, [query.data]);
 
     return {
         query,
@@ -34,6 +35,7 @@ export const useTransactionHistory = (params: TransactionHistoryRequestType) => 
 }
 
 export const useTransactionTotal = (account_id: number | null) => {
+
     const query =  useQuery({
         queryKey: ['transactionAPI-total', account_id],
         enabled: false,
@@ -44,13 +46,15 @@ export const useTransactionTotal = (account_id: number | null) => {
         },
         select: (res) => res.data
     });
+
     const {setTotal,total} = useTransactionStore();
 
     useEffect(() => {
         if (query.data) {
             setTotal(query.data);
         }
-    }, [query.data, setTotal]);
+    }, [query.data]);
+
     return {
         query,
         total

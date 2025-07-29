@@ -10,6 +10,7 @@ import {Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } fro
 import {Button, Form, H6, Input, Label, Spinner, XStack, YStack} from "tamagui";
 import {Controller} from "react-hook-form";
 import {AntDesign} from "@expo/vector-icons";
+import {useHeaderHeight} from "@react-navigation/elements";
 
 
 export default function ResetPasswordScreen() {
@@ -55,7 +56,7 @@ export default function ResetPasswordScreen() {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{flex: 1}}
-                keyboardVerticalOffset={64}
+                keyboardVerticalOffset={useHeaderHeight()}
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <Form gap="$4" padding="$6" onSubmit={handleSubmit(onSubmit)}>

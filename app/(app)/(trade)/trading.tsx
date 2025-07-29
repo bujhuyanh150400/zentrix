@@ -3,7 +3,7 @@ import {_Timeframe, _TradeType, _TypeChart, TIME_FRAME_SELECT} from "@/services/
 import {sizeDefault} from "@/components/ui/DefaultStyle";
 import type {WebView as WebViewType} from 'react-native-webview';
 import WebView from "react-native-webview";
-import {useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {router, useLocalSearchParams} from "expo-router";
 import {useGetAccountActive} from "@/services/account/hook";
 import useNestedState from "@/hooks/useNestedState";
@@ -36,6 +36,7 @@ export const TYPE_CHART_SELECT = [
 
 export default function TradingScreen() {
     const webViewRef = useRef<WebViewType>(null);
+
     const [isWebViewReady, setIsWebViewReady] = useState(false);
     const {symbol} = useLocalSearchParams<{ symbol?: string }>();
     const [openTransactionSheet, setOpenTransactionSheet] = useState<boolean>(false);
@@ -44,20 +45,19 @@ export default function TradingScreen() {
     const authData = useAuthStore(s => s.auth_data);
     // set loading
     const setLoading = useAppStore(state => state.setLoading);
-    
+
     const [filter, setFilter] = useNestedState({
         timeframe: _Timeframe.FiveMinute,
         type_chart: _TypeChart.LINE,
     });
-
     const queryItemSymbol = useQueryItemSymbol(symbol);
 
     // get realtime
     useSubscribeSymbols([symbol || ''], authData?.user?.id, authData?.user?.secret);
     const priceRealtime = useSubscribeSymbolStore(s => s.prices[symbol || '']);
 
-    const sendChartPayload = () => {
-        if (!webViewRef.current || !authData?.user) return;
+    const sendChartPayload = useCallback(() => {
+        if (!webViewRef.current || !authData?.user || !symbol) return;
         const payload = {
             symbol,
             interval: filter.timeframe,
@@ -66,14 +66,14 @@ export default function TradingScreen() {
             secret: authData?.user?.secret,
         };
         webViewRef.current.postMessage(JSON.stringify(payload));
-    };
+    },[authData?.user, filter.timeframe, filter.type_chart, symbol]);
 
-    // send to web view to handle chart
+    // // send to web view to handle chart
     useEffect(() => {
         if (!isWebViewReady || !webViewRef.current) return;
         sendChartPayload();
-    }, [symbol, filter.timeframe, filter.type_chart, authData, isWebViewReady, sendChartPayload]);
-
+    }, [symbol, filter.timeframe, filter.type_chart, authData, isWebViewReady]);
+    //
     const {bid, ask, spread} = calculateBidAskSpread(priceRealtime?.price, queryItemSymbol.data ? queryItemSymbol.data.spread : "");
 
     useEffect(() => {
@@ -88,11 +88,9 @@ export default function TradingScreen() {
         }
     }, [queryItemSymbol.isError]);
 
-
-
     useEffect(() => {
         setLoading(queryItemSymbol.isLoading || queryItemSymbol.isRefetching);
-    }, [queryItemSymbol.isLoading, queryItemSymbol.isRefetching, setLoading]);
+    }, [queryItemSymbol.isLoading, queryItemSymbol.isRefetching]);
 
     // call total transaction
     const {query} = useTransactionTotal(account?.id || null);
@@ -100,7 +98,8 @@ export default function TradingScreen() {
         if (account?.id) {
             query.refetch();
         }
-    }, [account?.id, query]);
+    }, [account?.id]);
+
 
     return (
         <>
@@ -155,11 +154,14 @@ export default function TradingScreen() {
                     style={{flex: 1}}
                     onMessage={(event) => {
                         if (event.nativeEvent.data === 'READY') {
-                            setIsWebViewReady(true);
+                            if (!isWebViewReady) {
+                                setIsWebViewReady(true);
+                            }
                             if (Platform.OS === 'android') {
-                                // android requires a delay to ensure the webview is fully loaded
                                 setTimeout(() => {
-                                    setIsWebViewReady(true);
+                                    if (!isWebViewReady) {
+                                        setIsWebViewReady(true);
+                                    }
                                 }, 300);
                             } else {
                                 sendChartPayload();
@@ -264,7 +266,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 10,
-        zIndex: 10,
+        zIndex: 1,
         backgroundColor: DefaultColor.white
     },
 })

@@ -22,7 +22,6 @@ export default function AuthLayout() {
             <FocusAwareStatusBar hidden/>
             <Stack>
                 <Stack.Screen name="index" options={{headerShown: false}}/>
-
                 <Stack.Screen
                     name="login/index"
                     options={{
@@ -45,7 +44,7 @@ export default function AuthLayout() {
                 <Stack.Screen name="register/success" options={{headerShown: false}}/>
 
                 <Stack.Screen
-                    name="forgot_pass"
+                    name="forgot_pass/index"
                     options={{
                         title: 'Quên mật khẩu',
                         headerTintColor: DefaultColor.black,
@@ -55,7 +54,7 @@ export default function AuthLayout() {
                 />
                 <Stack.Screen name="forgot_pass/verify" options={{headerShown: false}}/>
 
-                <Stack.Screen name="reset_pass" options={{headerShown: false}}/>
+                <Stack.Screen name="reset_pass/index" options={{headerShown: false}}/>
                 <Stack.Screen name="reset_pass/success" options={{headerShown: false}}/>
 
             </Stack>

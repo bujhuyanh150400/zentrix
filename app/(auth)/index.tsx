@@ -4,20 +4,24 @@ import {StyleSheet, View, Text} from "react-native";
 import {APP_NAME} from "@/libs/constant_env";
 import {Link} from "expo-router";
 import {TouchableOpacity} from "@gorhom/bottom-sheet";
-import {Paragraph} from "tamagui";
 import {sizeDefault} from "@/components/ui/DefaultStyle";
+import useDisableBackGesture from "@/hooks/useDisableBackGesture";
+
 
 export default function OnboardScreen() {
+    // chặn hành vi vuốt về
+    useDisableBackGesture();
 
     const [assets] = useAssets([require('@/assets/videos/intro.mp4')]);
 
     const player = useVideoPlayer({
         uri: assets && assets.length > 0 ? assets[0].uri : undefined
     }, player => {
-        player.play();
+        player.play()
         player.loop = true;
         player.muted = true;
     });
+
     return (
         <View style={styles.container}>
             {assets && (
@@ -47,7 +51,7 @@ export default function OnboardScreen() {
                     href={'/(auth)/register'}
                     style={[styles.button, { backgroundColor: '#fff' }]}
                     asChild>
-                    <TouchableOpacity>
+                    <TouchableOpacity >
                         <Text style={{ fontSize: sizeDefault["lg"], fontWeight: 500 }}>Đăng ký</Text>
                     </TouchableOpacity>
                 </Link>

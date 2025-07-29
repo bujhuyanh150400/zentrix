@@ -56,7 +56,7 @@ const TransactionTabs: FC<Props> = (props) => {
         if (query.isRefetching) {
             hookTotal.query.refetch()
         }
-    }, [hookTotal.query, query.isRefetching]);
+    }, [query.isRefetching]);
 
     useEffect(() => {
         if (props.account) {
@@ -65,11 +65,11 @@ const TransactionTabs: FC<Props> = (props) => {
         if (props.showTotal) {
             hookTotal.query.refetch();
         }
-    }, [hookTotal.query, props.account, props.showTotal, setFilter]);
+    }, [ props.account, props.showTotal]);
 
     useEffect(() => {
         query.refetch();
-    }, [filter.status, query]);
+    }, [filter.status]);
 
     return (
         <>

@@ -42,7 +42,8 @@ export const useSubscribeSymbols = (symbols: string[], userId?: number, secret?:
         }
         mountedSymbols.current = new Set(symbols);
         setSubscribedSymbols(new Set(symbols));
-    }, [ws, userId, secret, enable, symbols, setSubscribedSymbols]);
+    }, [ws, userId, secret, symbols.join(','), enable]);
+
 
 
     useEffect(() => {
@@ -67,7 +68,7 @@ export const useSubscribeSymbols = (symbols: string[], userId?: number, secret?:
         return () => {
             ws.removeEventListener('message', handler);
         };
-    }, [updatePrice, ws]);
+    }, [ws]);
 }
 
 export const useQueryListAssetTrading = (activeTab: _AssetType) => useQuery({

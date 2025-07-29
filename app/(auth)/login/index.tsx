@@ -27,7 +27,7 @@ export default function LoginScreen() {
         onSuccess: async (data) => {
             setAuthData(data);
             reset();
-            router.replace('/(auth)/pin')
+            router.replace('/(auth)/login/pin')
         },
         onError: (error) => {
             handleErrorApi({error, setError});
@@ -125,7 +125,7 @@ export default function LoginScreen() {
                                 {isSubmitting || isPending ? 'Đang gửi...' : 'Đăng nhập'}
                             </Button>
                             <Button
-                                onPress={() => router.push('/(auth)/forgotPassword')}
+                                onPress={() => router.push('/(auth)/forgot_pass')}
                                 disabled={isSubmitting || isPending}
                                 size="$4"
                                 variant="outlined"

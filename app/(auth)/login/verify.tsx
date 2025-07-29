@@ -13,6 +13,7 @@ import {KeyboardAvoidingView, Platform, View, TextInput as RNTextInput, Text} fr
 import {Circle, H6, Spinner, YStack} from "tamagui";
 import {AntDesign} from "@expo/vector-icons";
 import {pinStyles} from "@/components/ui/DefaultStyle";
+import {useHeaderHeight} from "@react-navigation/elements";
 
 
 export default function VerifyScreen() {
@@ -20,15 +21,15 @@ export default function VerifyScreen() {
     useDisableBackGesture();
 
     const [pin, setPin] = useState<string>('');
-    
-    const [pinError,setPinError] = useState(0);
+
+    const [pinError, setPinError] = useState(0);
 
     const {verify, pin_code, logout} = useAuthStore();
 
     const hasBiometrics = useCheckBiometrics();
 
     const ref = useBlurOnFulfill({value: pin, cellCount: CELL_PIN_INPUT});
-    
+
     const logoutError = useCallback((message: string = "Có lỗi không mong muốn xảy ra, vui lòng đăng nhập lại") => {
         logout();
         router.replace('/(auth)');
@@ -46,7 +47,7 @@ export default function VerifyScreen() {
     });
 
     const {refetch, isLoading, isSuccess, isError, data} = useQueryGetUserProfile();
-    
+
     useFocusEffect(
         useCallback(() => {
             let isActive = true;
@@ -80,9 +81,8 @@ export default function VerifyScreen() {
                 refetch()
             } else if (pinError === MAXIMUM_ERROR_ENTER_PIN) {
                 logoutError("Bạn đã nhập mã pin sai quá 5 lần, vui lòng đăng nhập lại")
-            }
-            else {
-                setPinError(prevState => prevState + 1);
+            } else {
+                setPinError(pinError + 1);
                 showMessage({
                     message: `Mã PIN không chính xác, số lần còn lại ${MAXIMUM_ERROR_ENTER_PIN - pinError}`,
                     type: "danger",
@@ -91,14 +91,14 @@ export default function VerifyScreen() {
                 });
             }
         }
-    }, [logoutError, pin, pinError, pin_code, refetch]);
-    
+    }, [pin, pin_code]);
+
     useEffect(() => {
         if (isSuccess && data) {
             verify(data).then((status) => {
-                if (status){
+                if (status) {
                     router.replace('/(app)/(tab)')
-                }else{
+                } else {
                     logoutError()
                 }
             }).catch(() => {
@@ -114,7 +114,7 @@ export default function VerifyScreen() {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{flex: 1}}
-                keyboardVerticalOffset={64}
+                keyboardVerticalOffset={useHeaderHeight()}
             >
                 <View style={{
                     flex: 1,

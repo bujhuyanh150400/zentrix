@@ -77,11 +77,11 @@ export default function AccountTabScreen() {
                                         <Paragraph theme="alt2" fontSize="$2">{activeAccount.code}</Paragraph>
                                     </XStack>
                                 </YStack>
-                                <Link href={'/(app)/(account)/list'}>
+                                {/*<Link href={'/(app)/(account)/list'}>*/}
                                     <TouchableOpacity>
                                         <FontAwesome6 name="list" size={18} color="black" />
                                     </TouchableOpacity>
-                                </Link>
+                                {/*</Link>*/}
 
                             </XStack>
                             <H4 fontWeight="bold">0 {activeAccount.currency.currency}</H4>
@@ -112,7 +112,7 @@ export default function AccountTabScreen() {
                                                 DefaultStyle.circleButton, {backgroundColor: DefaultColor.slate[200]}
                                             ]}
                                             onPress={() => {
-                                                router.push('/(app)/(account)/addStepOne');
+                                                // router.push('/(app)/(account)/a');
                                             }}
                                         >
                                             <FontAwesome6 name="add" size={10} color="black"/>
@@ -144,13 +144,13 @@ export default function AccountTabScreen() {
                                             paddingHorizontal={12}
                                             icon={<FontAwesome6 name="circle-down" size={18} color="black" />}
                                             onPress={() => {
-                                                router.push({
-                                                    pathname: '/(app)/(account)/recharge/credit',
-                                                    params: {
-                                                        account_id: activeAccount.id,
-                                                        currency: activeAccount.currency.currency,
-                                                    }
-                                                });
+                                                // router.push({
+                                                //     pathname: '/(app)/(account)/recharge/credit',
+                                                //     params: {
+                                                //         account_id: activeAccount.id,
+                                                //         currency: activeAccount.currency.currency,
+                                                //     }
+                                                // });
                                             }}
                                         />
                                         <Paragraph theme="alt2" fontSize="$2">Nạp tiền</Paragraph>
