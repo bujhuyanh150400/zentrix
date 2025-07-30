@@ -8,10 +8,11 @@ import {
 import {useAddAccountStore} from "@/services/account/store";
 import {useQuery} from "@tanstack/react-query";
 import accountAPI from "@/services/account/api";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import commonAPI from "@/services/common/api";
 
 
 
@@ -49,11 +50,9 @@ export const useGetAccountActive = (): UseGetAccountActiveHookType => {
 
 export const useFormCreateAccount = () => useForm<CreateAccountRequest>({
     resolver: yupResolver(yup.object({
-        user_id: yup.number().required('User ID không được để trống'),
         name: yup.string().required('Tên tài khoản là bắt buộc'),
         password: yup.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự').required('Mật khẩu là bắt buộc'),
-        currency_id: yup.number().required('Phải chọn loại tiền tệ'),
-        lever_id: yup.number().required('Phải chọn tỷ lệ đòn bẩy'),
+        lever_id: yup.number().min(0,'Phải chọn tỷ lệ đòn bẩy').required('Phải chọn tỷ lệ đòn bẩy'),
         account_type_id: yup.number().required('Phải chọn loại tài khoản'),
         account_type: yup
             .mixed<_AccountType>()
@@ -61,3 +60,22 @@ export const useFormCreateAccount = () => useForm<CreateAccountRequest>({
             .required('Phải chọn loại tài khoản'),
     })),
 })
+
+export const useQueryAccountTypeList = () => useQuery({
+    queryKey: ['commonAPI-accountTypeList'],
+    queryFn: commonAPI.accountTypeList,
+});
+
+
+export const useGetLeverOptions = () => {
+    const leversQuery = useQuery({
+        queryKey: ['commonAPI-levers'],
+        queryFn: commonAPI.levers,
+    });
+    return useMemo(() => {
+        return leversQuery.data?.data.map(lever => ({
+            label: `${lever.min} - ${lever.max}`,
+            value: lever.id.toString(),
+        })) || [];
+    }, [leversQuery.data]);
+}

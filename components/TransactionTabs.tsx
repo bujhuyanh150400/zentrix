@@ -155,7 +155,7 @@ const TransactionTabs: FC<Props> = (props) => {
                         setFilter({status: tab});
                     }}
                     styleContainer={{
-
+                        zIndex: -1
                     }}
                     styleTab={{
                         paddingVertical: 12,

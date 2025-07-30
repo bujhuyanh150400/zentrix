@@ -39,10 +39,8 @@ export enum _AccountType {
     REAL_ACCOUNT = 1,
 }
 export type CreateAccountRequest = {
-    user_id: number;
     name: string;// tên tài khoản
     password: string; // mật khẩu tài khoản
-    currency_id: number; // loai tiền tệ
     lever_id: number; // tỷ lệ đòn bẩy
     account_type_id: number; // id loại tài khoản
     account_type: _AccountType;  // loại tài khoản: REAL_ACCOUNT, CREDIT_ACCOUNT
