@@ -1,3 +1,4 @@
+import {AxiosError} from "axios";
 
 export type AccountType = {
     id: number; // id loại tài khoản
@@ -77,3 +78,11 @@ export type RechargeAccountRequest = {
     account_id: number; // id tài khoản
     money: number; // số tiền nạp vào tài khoản
 }
+
+export type UseGetAccountActiveHookType = {
+    account: AccountActiveResponse['data'] | null;
+    isSuccess: boolean;
+    get: () => Promise<any>;
+    loading: boolean;
+    error: AxiosError | null;
+};

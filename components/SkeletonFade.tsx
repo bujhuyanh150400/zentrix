@@ -1,7 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, View, StyleSheet } from 'react-native';
+import React, {FC, useEffect, useRef} from 'react';
+import { Animated, StyleSheet } from 'react-native';
+import DefaultColor from "@/components/ui/DefaultColor";
 
-const SkeletonFade = () => {
+type Props = {
+    width?:number | Animated.Value | "auto" | Animated.AnimatedInterpolation<string | number> | `${number}%` | Animated.WithAnimatedObject<Animated.AnimatedNode> | null | undefined,
+    height?:number | Animated.Value | "auto" | Animated.AnimatedInterpolation<string | number> | `${number}%` | Animated.WithAnimatedObject<Animated.AnimatedNode> | null | undefined,
+}
+
+const SkeletonFade:FC<Props> = (props) => {
     const opacity = useRef(new Animated.Value(0.3)).current;
 
     useEffect(() => {
@@ -22,15 +28,16 @@ const SkeletonFade = () => {
     }, []);
 
     return (
-        <Animated.View style={[styles.skeleton, { opacity }]} />
+        <Animated.View style={[styles.skeleton, { opacity }, {
+            width: props.width ?? 100,
+            height: props.height ?? 20,
+        }]} />
     );
 };
 
 const styles = StyleSheet.create({
     skeleton: {
-        backgroundColor: '#e0e0e0',
-        width: 100,
-        height: 20,
+        backgroundColor: DefaultColor.slate[200],
         borderRadius: 4,
     },
 });
