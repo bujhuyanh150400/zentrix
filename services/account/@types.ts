@@ -57,7 +57,6 @@ export type Account = {
     id: number;
     code: string;
     account_type_id: number;
-    currency_id: number;
     lever_id: number;
     name: string;
     money: number;
@@ -68,8 +67,7 @@ export type Account = {
     updated_at: string;
     deleted_at: string | null;
     user_id: number;
-    account_type: AccountType; // Thông tin loại tài khoản
-    currency: CurrencyType;
+    account_type: AccountType;
     lever: Lever
 };
 export type RechargeAccountRequest = {

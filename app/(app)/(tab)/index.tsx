@@ -29,7 +29,5 @@ export default function AccountTabScreen() {
             <AccountCard account={activeAccount} loading={queryAccountActive.loading} />
             <TransactionTabs account={queryAccountActive.account} showTotal={true} />
         </LayoutScrollApp>
-
-
     )
 }

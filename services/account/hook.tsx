@@ -6,7 +6,7 @@ import {
     UseGetAccountActiveHookType
 } from "@/services/account/@types";
 import {useAddAccountStore} from "@/services/account/store";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import accountAPI from "@/services/account/api";
 import {useEffect, useMemo} from "react";
 import {useForm} from "react-hook-form";
@@ -47,7 +47,6 @@ export const useGetAccountActive = (): UseGetAccountActiveHookType => {
     }
 }
 
-
 export const useFormCreateAccount = () => useForm<CreateAccountRequest>({
     resolver: yupResolver(yup.object({
         name: yup.string().required('Tên tài khoản là bắt buộc'),
@@ -66,7 +65,6 @@ export const useQueryAccountTypeList = () => useQuery({
     queryFn: commonAPI.accountTypeList,
 });
 
-
 export const useGetLeverOptions = () => {
     const leversQuery = useQuery({
         queryKey: ['commonAPI-levers'],
@@ -79,3 +77,12 @@ export const useGetLeverOptions = () => {
         })) || [];
     }, [leversQuery.data]);
 }
+
+export const useMutationCreateAccount = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: CreateAccountRequest) => accountAPI.createAccount(data),
+    onSuccess,
+    onError
+});

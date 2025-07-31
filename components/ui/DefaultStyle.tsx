@@ -75,6 +75,13 @@ const DefaultStyle = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    circleButtonSmall: {
+        width: 35,
+        height: 35,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     badge: {
         paddingHorizontal: 8,
         borderRadius: 8,
