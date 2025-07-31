@@ -53,3 +53,8 @@ export const calculateProfit = (price: number, percent: string, volume: string, 
         return (price * volumeValue - ((price * percentValue / 100) * volumeValue)).toFixed(2);
     }
 }
+
+export function generateUniqueIdRecharge(): string {
+    const uniquePart = Date.now().toString(16) + Math.floor(Math.random() * 1000000).toString(16);
+    return ('NAP' + uniquePart).toUpperCase();
+}

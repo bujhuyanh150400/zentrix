@@ -73,6 +73,7 @@ export type Account = {
 export type RechargeAccountRequest = {
     account_id: number; // id tài khoản
     money: number; // số tiền nạp vào tài khoản
+    transaction_code: string | null // mã giao dịch, nếu là account real
 }
 
 export type UseGetAccountActiveHookType = {

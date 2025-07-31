@@ -1,8 +1,8 @@
 import {AxiosError} from "axios";
 import {
-    _AccountType,
+    _AccountType, Account,
     AccountActiveResponse,
-    CreateAccountRequest,
+    CreateAccountRequest, RechargeAccountRequest,
     UseGetAccountActiveHookType
 } from "@/services/account/@types";
 import {useAddAccountStore} from "@/services/account/store";
@@ -13,7 +13,6 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import commonAPI from "@/services/common/api";
-
 
 
 export const useGetAccountActive = (): UseGetAccountActiveHookType => {
@@ -86,3 +85,34 @@ export const useMutationCreateAccount = ({onSuccess,onError}: {
     onSuccess,
     onError
 });
+
+export const useRechargeAccountForm = (account: Account) => {
+    const schema: yup.ObjectSchema<RechargeAccountRequest> = useMemo(() => yup.object({
+        account_id: yup
+            .number()
+            .typeError('ID tài khoản phải là số')
+            .required('ID tài khoản là bắt buộc'),
+
+        money: yup
+            .number()
+            .typeError('Số tiền phải là số')
+            .required('Số tiền là bắt buộc')
+            .min( Number(account.account_type.min), ({ min }) => `Số tiền tối thiểu là ${min.toLocaleString()}`)
+            .max( Number(account.account_type.max), ({ max }) => `Số tiền tối đa là ${max.toLocaleString()}`),
+
+        transaction_code: yup
+            .string()
+            .nullable()
+            .required('Mã giao dịch là bắt buộc')
+    }),[account]);
+    return  useForm<RechargeAccountRequest>({
+        resolver: yupResolver(schema,
+            {
+                context: {
+                    min: Number(account.account_type.min),
+                    max: Number(account.account_type.max),
+                },
+            }
+        ),
+    });
+}

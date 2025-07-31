@@ -9,6 +9,7 @@ import {StyleSheet, Text} from "react-native";
 import SkeletonFade from "@/components/SkeletonFade";
 import AddAccountView from "@/components/account/AddAccountView";
 import AccountSheet from "@/components/account/Sheet";
+import RechargeView from "@/components/account/RechargeView";
 
 type Props = {
     account: Account | null,
@@ -174,6 +175,8 @@ export const AccountCard: FC<Props> = ({account, loading}) => {
             </Card>
             <AccountSheet ref={accountSheetRef} open={openSheet} setOpen={setOpenSheet}>
                 {view === _ViewAccount.ADD && <AddAccountView open={openSheet} setOpen={setOpenSheet}/>}
+                {view === _ViewAccount.RECHARGE && account && <RechargeView open={openSheet} setOpen={setOpenSheet} account={account}/>}
+
             </AccountSheet>
         </>
     )
