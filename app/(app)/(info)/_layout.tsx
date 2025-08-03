@@ -12,31 +12,22 @@ export default function InfoLayout() {
             }}
         >
             <Stack.Screen
-                name="userInfo"
+                name="userinfo"
                 options={{
-                    title: "",
-                    headerShown: true,
-                    headerTintColor: DefaultColor.black,
-                    headerBackButtonDisplayMode: "minimal",
+                    header: () => <HeaderBack />,
                 }}
             />
             {/* Xác nhận người dùng */}
             <Stack.Screen
                 name="verify_user/stepOne"
                 options={{
-                    title: "",
-                    headerShown: true,
-                    headerTintColor: DefaultColor.black,
-                    headerBackButtonDisplayMode: "minimal",
+                    header: () => <HeaderBack />,
                 }}
             />
             <Stack.Screen
                 name="verify_user/stepTwo"
                 options={{
-                    title: "",
-                    headerShown: true,
-                    headerTintColor: DefaultColor.black,
-                    headerBackButtonDisplayMode: "minimal",
+                    header: () => <HeaderBack />,
                 }}
             />
             <Stack.Screen

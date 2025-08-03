@@ -27,6 +27,7 @@ import {useShowErrorHandler} from "@/hooks/useHandleError";
 type Props = {
     open: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>,
+    onCreateSuccess?:() => void
 }
 
 enum _Step {
@@ -100,7 +101,10 @@ const AddAccountView: FC<Props> = (props) => {
             reset();
             setStep(_Step.STEP_1);
             props.setOpen(false);
-            queryAccountActive.get()
+            queryAccountActive.get();
+            if (props.onCreateSuccess){
+                props.onCreateSuccess();
+            }
         },
         onError: (error) => {
             // eslint-disable-next-line react-hooks/rules-of-hooks

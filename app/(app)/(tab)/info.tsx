@@ -38,7 +38,7 @@ export default function InfoScreen() {
                         Tài khoản
                     </Paragraph>
                     <TouchableOpacity
-                        onPress={() => router.push("/(app)/(info)/userInfo")}
+                        onPress={() => router.push("/(app)/(info)/userinfo")}
                     >
                         <XStack alignItems="center" justifyContent="space-between" gap="$4">
                             <XStack alignItems="center" gap="$4">

@@ -1,12 +1,17 @@
 import {AxiosError} from "axios";
 import {
-    _AccountType, Account,
-    AccountActiveResponse,
-    CreateAccountRequest, RechargeAccountRequest,
+    _AccountType,
+    Account,
+    AccountActiveResponse, AccountIdRequest,
+    CreateAccountRequest,
+    EditLeverRequest,
+    ListAccountRequest, ListHistoryRequest,
+    RechargeAccountForm,
+    RechargeAccountRequest,
     UseGetAccountActiveHookType
 } from "@/services/account/@types";
 import {useAddAccountStore} from "@/services/account/store";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useInfiniteQuery, useMutation, useQuery} from "@tanstack/react-query";
 import accountAPI from "@/services/account/api";
 import {useEffect, useMemo} from "react";
 import {useForm} from "react-hook-form";
@@ -86,33 +91,81 @@ export const useMutationCreateAccount = ({onSuccess,onError}: {
     onError
 });
 
-export const useRechargeAccountForm = (account: Account) => {
-    const schema: yup.ObjectSchema<RechargeAccountRequest> = useMemo(() => yup.object({
-        account_id: yup
-            .number()
-            .typeError('ID tài khoản phải là số')
-            .required('ID tài khoản là bắt buộc'),
 
+export const useRechargeAccountForm = (account: Account| null) => {
+    const schema: yup.ObjectSchema<RechargeAccountForm> = useMemo(() => yup.object({
+        account_id: yup.number().required(),
         money: yup
             .number()
             .typeError('Số tiền phải là số')
             .required('Số tiền là bắt buộc')
-            .min( Number(account.account_type.min), ({ min }) => `Số tiền tối thiểu là ${min.toLocaleString()}`)
-            .max( Number(account.account_type.max), ({ max }) => `Số tiền tối đa là ${max.toLocaleString()}`),
-
-        transaction_code: yup
-            .string()
-            .nullable()
-            .required('Mã giao dịch là bắt buộc')
+            .min( Number(account?.account_type.min || 0), ({ min }) => `Số tiền tối thiểu là ${min.toLocaleString('en-US')} USD`)
+            .max( Number(account?.account_type.max || 0), ({ max }) => `Số tiền tối đa là ${max.toLocaleString('en-US')} USD`),
+        transaction_code: yup.string().nullable(),
+        amount_vnd: yup.number().nullable()
     }),[account]);
-    return  useForm<RechargeAccountRequest>({
-        resolver: yupResolver(schema,
-            {
-                context: {
-                    min: Number(account.account_type.min),
-                    max: Number(account.account_type.max),
-                },
-            }
-        ),
+
+    return  useForm<RechargeAccountForm>({
+        resolver: yupResolver(schema),
     });
 }
+
+export const useMutationRecharge = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: RechargeAccountRequest) => accountAPI.recharge(data),
+    onSuccess,
+    onError
+});
+
+export const useMutationEditLever = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: EditLeverRequest) => accountAPI.editLever(data),
+    onSuccess,
+    onError,
+});
+
+export const useInfiniteAccountList = (queryParams: ListAccountRequest) => {
+    return useInfiniteQuery({
+        queryKey: ['accountAPI-accountList', queryParams],
+        queryFn: ({pageParam = 1}) => {
+            return accountAPI.accountList({
+                ...queryParams,
+                page: pageParam,
+            });
+        },
+        getNextPageParam: (lastPage) => {
+            const next = lastPage.meta.current_page + 1;
+            return next <= lastPage.meta.last_page ? next : undefined;
+        },
+        initialPageParam: 1,
+    });
+};
+
+export const useMutationEditActiveAccount = () => useMutation({
+    mutationFn: (data: AccountIdRequest) => accountAPI.editActiveAccount(data),
+});
+
+export const useMutationDeletedAccount = () => useMutation({
+    mutationFn: (data: AccountIdRequest) => accountAPI.deletedAccount(data),
+});
+
+export const useInfiniteHistoryList = (queryParams: ListHistoryRequest) => {
+    return useInfiniteQuery({
+        queryKey: ['accountAPI-listHistory', queryParams],
+        queryFn: ({pageParam = 1}) => {
+            return accountAPI.listHistory({
+                ...queryParams,
+                page: pageParam,
+            });
+        },
+        getNextPageParam: (lastPage) => {
+            const next = lastPage.meta.current_page + 1;
+            return next <= lastPage.meta.last_page ? next : undefined;
+        },
+        initialPageParam: 1,
+    });
+};

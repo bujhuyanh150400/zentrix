@@ -23,8 +23,8 @@ export default function PopoverCustom({Trigger,children, shouldAdapt, width, hei
                         <Popover.Sheet.Overlay
                             backgroundColor="$shadowColor"
                             animation="lazy"
-                            enterStyle={{opacity: 0}}
-                            exitStyle={{opacity: 0}}
+                            enterStyle={{opacity: 0.6}}
+                            exitStyle={{opacity: 0.6}}
                         />
                     </Popover.Sheet>
                 </Adapt>

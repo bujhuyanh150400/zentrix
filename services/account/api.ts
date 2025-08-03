@@ -1,7 +1,12 @@
 import {
     AccountActiveResponse,
-    AccountListResponse,
+    AccountIdRequest,
     CreateAccountRequest,
+    EditLeverRequest,
+    ListAccountRequest,
+    ListAccountResponse,
+    ListHistoryRequest,
+    ListHistoryResponse,
     RechargeAccountRequest
 } from "@/services/account/@types";
 import {client} from "@/libs/client";
@@ -9,8 +14,8 @@ import {ResponseSuccessType} from "@/libs/@type";
 
 
 const accountAPI = {
-    accountList: async (): Promise<AccountListResponse> => {
-        const response = await client.get('/list-account');
+    accountList: async (params: ListAccountRequest): Promise<ListAccountResponse> => {
+        const response = await client.get('/list-account', {params: params});
         return response.data;
     },
     accountActive: async (): Promise<AccountActiveResponse> => {
@@ -21,10 +26,30 @@ const accountAPI = {
         const response = await client.post('/create-account', data);
         return response.data;
     },
-    recharge: async (data: RechargeAccountRequest) : Promise<ResponseSuccessType> => {
+    recharge: async (data: RechargeAccountRequest): Promise<ResponseSuccessType> => {
         const response = await client.post('/recharge-account', data);
         return response.data;
-    }
+    },
+    editLever: async (data: EditLeverRequest): Promise<ResponseSuccessType> => {
+        const response = await client.post('/edit-lever-account', data);
+        return response.data;
+    },
+    editActiveAccount: async (data: AccountIdRequest): Promise<ResponseSuccessType> => {
+        const response = await client.post('/edit-active-account', data);
+        return response.data;
+    },
+    deletedAccount: async (data: AccountIdRequest): Promise<ResponseSuccessType> => {
+        const response = await client.post('/deleted-account', data);
+        return response.data;
+    },
+    listHistory: async (params: ListHistoryRequest): Promise<ListHistoryResponse> => {
+        const response = await client.get(`/list-account-history/${params.account_id}`, {
+            params:{
+                params: params.page ?? 1
+            }
+        });
+        return response.data;
+    },
 }
 
 export default accountAPI;

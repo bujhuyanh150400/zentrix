@@ -17,3 +17,17 @@ export const useGetListBankOptions = () => {
         );
     }, [listBankQuery.data]);
 }
+
+export const useGetBankConfig = () => {
+    const bankConfigQuery = useQuery({
+        queryKey: ["commonAPI-bankConfig"],
+        queryFn: commonAPI.bankConfig,
+        select: (res) => res.data
+    });
+
+
+    return {
+        loading: bankConfigQuery.isLoading || bankConfigQuery.isRefetching,
+        data: useMemo(() => bankConfigQuery.data ? bankConfigQuery.data : null, [bankConfigQuery.data])
+    };
+}

@@ -38,6 +38,10 @@ export enum _AccountType {
     TEST_ACCOUNT = 0,
     REAL_ACCOUNT = 1,
 }
+export enum _AccountStatus {
+    ACTIVE = 1,
+    IN_ACTIVE = 2
+}
 export type CreateAccountRequest = {
     name: string;// tên tài khoản
     password: string; // mật khẩu tài khoản
@@ -45,10 +49,7 @@ export type CreateAccountRequest = {
     account_type_id: number; // id loại tài khoản
     account_type: _AccountType;  // loại tài khoản: REAL_ACCOUNT, CREDIT_ACCOUNT
 };
-export type AccountListResponse = {
-    message: string;
-    data: Account[];
-};
+
 export type AccountActiveResponse = {
     message: string;
     data: Account;
@@ -62,7 +63,7 @@ export type Account = {
     money: number;
     profit: number;
     type: _AccountType;
-    status: number;
+    status: _AccountStatus;
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
@@ -73,7 +74,75 @@ export type Account = {
 export type RechargeAccountRequest = {
     account_id: number; // id tài khoản
     money: number; // số tiền nạp vào tài khoản
-    transaction_code: string | null // mã giao dịch, nếu là account real
+    transaction_code?: string // mã giao dịch, nếu là account real,
+    amount_vnd?: number, // gía chuyển đổi
+    bank_name?:string,
+    bank_account_number?:string,
+    bank_account_name?:string
+}
+export type RechargeAccountForm = Pick<RechargeAccountRequest, 'account_id' | 'money'>
+
+export type EditLeverRequest = {
+    account_id: number;
+    lever_id:number
+}
+export type AccountIdRequest = {
+    account_id: number;
+}
+export type ListHistoryRequest = {
+    account_id: number;
+    page?: number
+}
+
+export enum _HistoryType {
+    RECHARGE = 0,
+    WITHDRAW = 1,
+}
+export enum _HistoryStatus {
+    STATUS_PROCESSING = 0,
+    STATUS_DONE = 1,
+    STATUS_UNAPPROVE = 2,
+}
+
+export type History = {
+    "id": number,
+    "transaction_code": string | null,
+    "account_id": number,
+    "price": string,
+    "amount_vnd": string | null,
+    "bank_name": string | null,
+    "account_number": string | null,
+    "account_name": string | null,
+    "type": _HistoryType,
+    "status": _HistoryStatus,
+}
+
+export type ListHistoryResponse = {
+    data: History[];
+    meta: {
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
+}
+
+export enum _TypeSearch  {
+    REAL = 'real',
+    CREDIT = 'credit'
+}
+export type ListAccountRequest = {
+    type: _TypeSearch;
+    page?: number;
+}
+export type ListAccountResponse = {
+    data: Account[];
+    meta: {
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
 }
 
 export type UseGetAccountActiveHookType = {

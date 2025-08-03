@@ -20,3 +20,14 @@ export type ListBankResponse = {
     data: Bank[];
     message: string;
 }
+export type BankConfig = {
+    "bank_name": string,
+    "account_name": string,
+    "account_number": string,
+    "branch": string,
+    "qr_code": string
+}
+export type BankConfigResponse = {
+    data: BankConfig | null;
+    message: string;
+}

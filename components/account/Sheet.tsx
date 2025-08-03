@@ -1,11 +1,10 @@
-import {Dispatch, forwardRef, ReactNode, SetStateAction, useEffect, useImperativeHandle, useRef} from "react";
+import {forwardRef, ReactNode, useEffect, useImperativeHandle, useRef} from "react";
 import BottomSheet, {BottomSheetBackdrop, BottomSheetView} from "@gorhom/bottom-sheet";
 import {useNavigation} from "expo-router";
 
-
 type Props = {
     open: boolean,
-    setOpen: Dispatch<SetStateAction<boolean>>,
+    setOpen: (open: boolean) => void,
     children: ReactNode
 }
 

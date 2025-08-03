@@ -18,12 +18,14 @@ import {ActivityIndicator, Platform, StyleSheet, TouchableOpacity, View} from "r
 import {Paragraph, XStack, YStack} from "tamagui";
 import SymbolAssetIcons from "@/components/SymbolAssetIcons";
 import DefaultColor from "@/components/ui/DefaultColor";
-import HeaderBack from "@/components/HeaderBack";
 import SkeletonFade from "@/components/SkeletonFade";
 import TransactionSection from "@/components/TransactionSection";
 import { BACKEND_REACT_URL } from "@/libs/constant_env";
 import BottomSheetSelect from "@/components/BottomSheetSelect";
 import TransactionSheet from "@/components/TransactionSheet";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import BadgeAccount from "@/components/account/Badge";
 
 export const TYPE_CHART_SELECT = [
     {label: 'Đường', unit: <FontAwesome6 name="chart-line" size={sizeDefault.md} color="black"/>, value: _TypeChart.LINE},
@@ -36,6 +38,7 @@ export const TYPE_CHART_SELECT = [
 
 export default function TradingScreen() {
     const webViewRef = useRef<WebViewType>(null);
+    const insets = useSafeAreaInsets();
 
     const [isWebViewReady, setIsWebViewReady] = useState(false);
     const {symbol} = useLocalSearchParams<{ symbol?: string }>();
@@ -103,7 +106,30 @@ export default function TradingScreen() {
 
     return (
         <>
-            <HeaderBack/>
+            <View
+                style={{
+                    backgroundColor: DefaultColor.white,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 10,
+                    paddingTop: insets.top,
+                    paddingBottom: 10,
+                }}
+            >
+                <TouchableOpacity
+                    onPress={() => {
+                        router.back();
+                    }}
+                    style={{
+                        padding: 8,
+                        borderRadius: 100,
+                    }}
+                >
+                    <Ionicons name="chevron-back" size={24} color="#000" />
+                </TouchableOpacity>
+                <BadgeAccount />
+            </View>
             <View style={{flex: 1, paddingTop: 0}}>
                 {/*Header*/}
                 <View style={{

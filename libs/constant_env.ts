@@ -18,3 +18,5 @@ export const APP_INFO = {
 
 export const SUPPORT_PHONE_NUMBER = "18006371"
 
+export const BALANCE_SYMBOL_FOR_ACCOUNT_WALLET = "USD/VND";
+
