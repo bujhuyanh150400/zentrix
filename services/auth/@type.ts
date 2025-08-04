@@ -52,7 +52,9 @@ export type UserLogin = {
     bin_bank: string;
     account_bank: string;
     account_bank_name: string;
-    banks?: Bank
+    banks?: Bank,
+    referrer_id: string | null;
+    referral_code: string | null;
 }
 export type LoginResponse = {
     token: string;

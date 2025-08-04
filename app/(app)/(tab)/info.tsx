@@ -13,10 +13,13 @@ import InfoAppCanvas from "@/components/InfoAppCanvas";
 import LayoutScrollApp from "@/components/LayoutScrollApp";
 import {Button, Paragraph, Separator, Spinner, XStack, YStack} from "tamagui";
 import { router } from "expo-router";
-import {AntDesign, FontAwesome6, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
+import {AntDesign, FontAwesome, FontAwesome6, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import { _VerifyUserStatus } from "@/services/auth/@type";
 import {maintainWarning} from "@/hooks/reuseFunc";
 import {APP_NAME} from "@/libs/constant_env";
+import * as Clipboard from 'expo-clipboard';
+import {showMessage} from "react-native-flash-message";
+import {sizeDefault} from "@/components/ui/DefaultStyle";
 
 
 export default function InfoScreen() {
@@ -33,59 +36,87 @@ export default function InfoScreen() {
     return (
         <>
             <LayoutScrollApp title="Hồ sơ">
-                <YStack gap={4} marginTop={24} paddingBottom={100}>
+                <YStack gap={"$2"} marginTop={24} paddingBottom={100}>
                     <Paragraph fontWeight={700} fontSize={20} marginBottom={16}>
                         Tài khoản
                     </Paragraph>
-                    <TouchableOpacity
-                        onPress={() => router.push("/(app)/(info)/userinfo")}
-                    >
-                        <XStack alignItems="center" justifyContent="space-between" gap="$4">
-                            <XStack alignItems="center" gap="$4">
-                                <View style={style.box_icon}>
-                                    <FontAwesome6 name="user" size={18} color="black" />
-                                </View>
-                                <Paragraph fontWeight={500}>Thông tin cá nhân</Paragraph>
-                            </XStack>
-                            <XStack gap="$2" alignItems="center">
-                                {userProfileQuery.isFetching && <Spinner />}
-                                {userProfile && (
-                                    <View
-                                        style={{
-                                            paddingHorizontal: 8,
-                                            borderRadius: 32,
-                                            backgroundColor:
-                                                userProfile.status === _VerifyUserStatus.ACTIVE
-                                                    ? "#EEFBF3"
-                                                    : userProfile.status === _VerifyUserStatus.IN_ACTIVE
-                                                        ? "#FDF1EC"
-                                                        : userProfile.status === _VerifyUserStatus.WAITING
-                                                            ? "#FFFBED"
-                                                            : "#ccc",
-                                        }}
-                                    >
-                                        {userProfile.status === _VerifyUserStatus.ACTIVE && (
-                                            <Paragraph fontWeight={500} fontSize={12} color="427C5C">
-                                                Đã xác minh
-                                            </Paragraph>
-                                        )}
-                                        {userProfile.status === _VerifyUserStatus.IN_ACTIVE && (
-                                            <Paragraph fontWeight={500} fontSize={12} color="#814441">
-                                                Chưa xác minh
-                                            </Paragraph>
-                                        )}
-                                        {userProfile.status === _VerifyUserStatus.WAITING && (
-                                            <Paragraph fontWeight={500} fontSize={12}>
-                                                Chờ xác minh
-                                            </Paragraph>
-                                        )}
+                    <YStack gap="$4">
+                        <TouchableOpacity
+                            onPress={() => router.push("/(app)/(info)/userinfo")}
+                        >
+                            <XStack alignItems="center" justifyContent="space-between" gap="$4">
+                                <XStack alignItems="center" gap="$4">
+                                    <View style={style.box_icon}>
+                                        <FontAwesome6 name="user" size={18} color="black" />
                                     </View>
-                                )}
-                                <FontAwesome6 name="angle-right" size={20} color="black" />
+                                    <Paragraph fontWeight={500}>Thông tin cá nhân</Paragraph>
+                                </XStack>
+                                <XStack gap="$2" alignItems="center">
+                                    {userProfileQuery.isFetching && <Spinner />}
+                                    {userProfile && (
+                                        <View
+                                            style={{
+                                                paddingHorizontal: 8,
+                                                borderRadius: 32,
+                                                backgroundColor:
+                                                    userProfile.status === _VerifyUserStatus.ACTIVE
+                                                        ? "#EEFBF3"
+                                                        : userProfile.status === _VerifyUserStatus.IN_ACTIVE
+                                                            ? "#FDF1EC"
+                                                            : userProfile.status === _VerifyUserStatus.WAITING
+                                                                ? "#FFFBED"
+                                                                : "#ccc",
+                                            }}
+                                        >
+                                            {userProfile.status === _VerifyUserStatus.ACTIVE && (
+                                                <Paragraph fontWeight={500} fontSize={12} color="427C5C">
+                                                    Đã xác minh
+                                                </Paragraph>
+                                            )}
+                                            {userProfile.status === _VerifyUserStatus.IN_ACTIVE && (
+                                                <Paragraph fontWeight={500} fontSize={12} color="#814441">
+                                                    Chưa xác minh
+                                                </Paragraph>
+                                            )}
+                                            {userProfile.status === _VerifyUserStatus.WAITING && (
+                                                <Paragraph fontWeight={500} fontSize={12}>
+                                                    Chờ xác minh
+                                                </Paragraph>
+                                            )}
+                                        </View>
+                                    )}
+                                    <FontAwesome6 name="angle-right" size={20} color="black" />
+                                </XStack>
                             </XStack>
-                        </XStack>
-                    </TouchableOpacity>
-
+                        </TouchableOpacity>
+                        {userProfile?.referral_code && (
+                            <XStack alignItems="center" justifyContent="space-between" gap="$4">
+                                <XStack alignItems="center" gap="$4">
+                                    <View style={style.box_icon}>
+                                        <MaterialCommunityIcons name="ticket-percent-outline" size={sizeDefault.lg} color="black" />
+                                    </View>
+                                    <Paragraph fontWeight={500}>Mã giới thiệu</Paragraph>
+                                </XStack>
+                                <TouchableOpacity onPress={async () => {
+                                    if (userProfile?.referral_code) {
+                                        await Clipboard.setStringAsync(userProfile.referral_code);
+                                        showMessage({
+                                            message: "Đã copy vào clipboard",
+                                            type: 'info',
+                                            duration: 3000,
+                                        });
+                                    }
+                                }}>
+                                    <XStack gap="$2" alignItems="center">
+                                        <Paragraph fontWeight={500} fontSize={12} color={DefaultColor.slate[400]}>
+                                            {userProfile.referral_code}
+                                        </Paragraph>
+                                        <FontAwesome name="copy" size={sizeDefault.lg} color="black" />
+                                    </XStack>
+                                </TouchableOpacity>
+                            </XStack>
+                        )}
+                    </YStack>
                     {userProfile?.status === _VerifyUserStatus.IN_ACTIVE && (
                         <View
                             style={{

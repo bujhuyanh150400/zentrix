@@ -31,3 +31,20 @@ export type BankConfigResponse = {
     data: BankConfig | null;
     message: string;
 }
+
+export enum _ConfigKey {
+    TRANSACTION_FEE = 'TRANSACTION_FEE',
+    TRANSACTION_FEE_OVERNIGHT = 'TRANSACTION_FEE_OVERNIGHT'
+}
+
+export type Config = {
+    key: _ConfigKey;
+    type: 'text' | 'number' | 'boolean';
+    value: string,
+    description: string | null,
+}
+
+export type ConfigResponse = {
+    data: Config[];
+    message: string;
+}

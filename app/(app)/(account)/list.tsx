@@ -154,6 +154,9 @@ export default function ListScreen() {
                     }
                     renderItem={({item, index}) => (
                         <Swipeable
+                            containerStyle={{
+                                marginBottom: 15
+                            }}
                             ref={(ref) => {
                                 swipeRefs.current[item.id] = ref;
                             }}
@@ -260,7 +263,7 @@ export default function ListScreen() {
                             overshootRight={false}
                         >
                             <Card size={"$2"} paddingVertical={8} paddingHorizontal={16} bordered
-                                  backgroundColor={DefaultColor.white} marginBottom={15}>
+                                  backgroundColor={DefaultColor.white}>
                                 <YStack gap={"$2"}>
                                     <XStack alignItems={"center"} gap={"$2"} justifyContent={"space-between"}>
                                         <Text style={{

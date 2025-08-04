@@ -1,7 +1,7 @@
 import {client} from "@/libs/client";
 import {
     AccountTypeListResponse,
-    BankConfigResponse,
+    BankConfigResponse, ConfigResponse,
     CurrencyResponse,
     LeverResponse,
     ListBankResponse
@@ -28,7 +28,11 @@ const commonAPI = {
     bankConfig: async (): Promise<BankConfigResponse> => {
         const response = await client.get('/config/bank-accounts');
         return response.data;
-    }
+    },
+    config: async (): Promise<ConfigResponse> => {
+        const response = await client.get('/config/list');
+        return response.data;
+    },
 }
 
 export default commonAPI;

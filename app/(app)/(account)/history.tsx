@@ -1,4 +1,4 @@
-import {ActivityIndicator, Alert, FlatList, Text, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, FlatList, Text, TouchableOpacity, View} from "react-native";
 import DefaultColor from "@/components/ui/DefaultColor";
 import {router} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
@@ -6,13 +6,10 @@ import {Card, Paragraph, XStack, YStack} from "tamagui";
 import DefaultStyle, {sizeDefault} from "@/components/ui/DefaultStyle";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import useNestedState from "@/hooks/useNestedState";
-import {_AccountStatus, _HistoryStatus, _HistoryType, ListHistoryRequest} from "@/services/account/@types";
+import {_HistoryStatus, _HistoryType, ListHistoryRequest} from "@/services/account/@types";
 import {useGetAccountActive, useInfiniteHistoryList} from "@/services/account/hook";
 import {useEffect} from "react";
 import {RefreshControl} from "react-native-gesture-handler";
-import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import {showMessage} from "react-native-flash-message";
-import {useShowErrorHandler} from "@/hooks/useHandleError";
 
 
 export default function HistoryScreen(){
