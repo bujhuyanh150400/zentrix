@@ -4,12 +4,12 @@ import {useApiErrorHandler} from "@/hooks/useHandleError";
 import {FormRegisterType, RegisterRequest} from "@/services/auth/@type";
 import {router} from "expo-router";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {Keyboard, KeyboardAvoidingView, Platform} from "react-native";
+import {Keyboard} from "react-native";
 import {TouchableWithoutFeedback} from "@gorhom/bottom-sheet";
 import {Button, H6, Input, Label, Spinner, XStack, YStack,Form} from "tamagui";
 import {Controller} from "react-hook-form";
 import {AntDesign} from "@expo/vector-icons";
-import {useHeaderHeight} from "@react-navigation/elements";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 
 export default function RegisterScreen() {
@@ -29,23 +29,25 @@ export default function RegisterScreen() {
     });
 
     const onSubmit = useCallback((data: FormRegisterType) => {
-        const request = {
+        const request: RegisterRequest = {
             name: data.name,
             email: data.email,
             password: data.password,
+            ref: data.ref
         }
         mutate(request);
     }, [mutate]);
 
     return (
         <SafeAreaView style={{flex: 1}} edges={['top', 'bottom']}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{flex: 1}}
-                keyboardVerticalOffset={useHeaderHeight()}
+            <KeyboardAwareScrollView
+                keyboardShouldPersistTaps="handled"
+                enableOnAndroid
+                showsVerticalScrollIndicator={false}
+                scrollEnabled={true}
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{flex: 1}}>
-                    <Form gap="$4" padding="$6" onSubmit={handleSubmit(onSubmit)}>
+                    <Form gap="$4" paddingHorizontal="$6" paddingBottom="$6" onSubmit={handleSubmit(onSubmit)}>
                         <YStack gap="$4">
                             <H6 fontWeight="bold">Vui lòng điền thông tin đăng ký tài khoản</H6>
                             <Controller
@@ -95,6 +97,31 @@ export default function RegisterScreen() {
                                     </YStack>
                                 )}
                             />
+
+                            <Controller
+                                control={control}
+                                name="ref"
+                                render={({field: {onChange, onBlur, value}}) => (
+                                    <YStack gap="$2">
+                                        <Input
+                                            id="ref"
+                                            placeholder="Mã giới thiệu (nếu có)"
+                                            value={value}
+                                            onChangeText={onChange}
+                                            onBlur={onBlur}
+                                            keyboardType="default"
+                                            autoCapitalize="none"
+                                            borderColor={!!errors.ref ? 'red' : '$borderColor'}
+                                        />
+                                        {!!errors.ref && (
+                                            <Label color="red" size="$2">
+                                                {errors.ref.message}
+                                            </Label>
+                                        )}
+                                    </YStack>
+                                )}
+                            />
+
 
                             <Controller
                                 control={control}
@@ -195,7 +222,7 @@ export default function RegisterScreen() {
                         </YStack>
                     </Form>
                 </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     )
 

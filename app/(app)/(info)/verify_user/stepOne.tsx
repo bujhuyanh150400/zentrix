@@ -260,7 +260,7 @@ export default function StepOneScreen() {
                                         placeholder="Tên tài khoản ngân hàng"
                                         value={value ?? ""}
                                         onChangeText={(text) => {
-                                            const formatted = removeVietnameseTones(text);
+                                            const formatted = removeVietnameseTones(text).toUpperCase();
                                             onChange(formatted);
                                         }}
                                         backgroundColor="#fff"

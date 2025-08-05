@@ -13,13 +13,12 @@ import useNestedState from "@/hooks/useNestedState";
 import {showMessage} from "react-native-flash-message";
 import {useShowErrorHandler} from "@/hooks/useHandleError";
 import {calculateProfit, formatNumber, parseToNumber} from "@/libs/utils";
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View} from "react-native";
 import {Button, Paragraph,  XStack, YStack} from "tamagui";
 import {MaterialIcons} from '@expo/vector-icons';
 import DefaultColor from "@/components/ui/DefaultColor";
 import HorizontalTabBar from "@/components/HorizontalTabBar";
-import BottomSheet, {BottomSheetBackdrop, BottomSheetView} from '@gorhom/bottom-sheet';
+import BottomSheet, {BottomSheetBackdrop, BottomSheetView, BottomSheetScrollView} from '@gorhom/bottom-sheet';
 
 const SNAP_CLOSE = 35;
 const SNAP_OPEN = 70;
@@ -224,11 +223,11 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
             )}
         >
             <BottomSheetView>
-                <KeyboardAwareScrollView
+                <BottomSheetScrollView
                     keyboardShouldPersistTaps="handled"
-                    enableOnAndroid
                     showsVerticalScrollIndicator={false}
-                    scrollEnabled={keyboardVisible}
+                    scrollEnabled={true}
+                    contentContainerStyle={{paddingBottom: keyboardVisible ? 200 : 0}} // để tránh bị che
                 >
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                         <YStack padding="$4" gap="$2">
@@ -390,44 +389,47 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                                     </>
                                 )}
                             </View>
-                            <XStack gap="$2" alignItems="center" marginTop={"$4"}>
-                                <Button onPress={() => props.setOpen(false)}>Hủy</Button>
-                                <Button
-                                    disabled={error.isError}
-                                    flex={1}
-                                    theme={props.tradeType === _TradeType.BUY ? "blue" : "red"}
-                                    backgroundColor={props.tradeType === _TradeType.BUY ?
-                                        (error.isError ? DefaultColor.blue[300] : DefaultColor.blue[500]) :
-                                        (error.isError ? DefaultColor.red[300] : DefaultColor.red[500])}
-                                    color="#fff"
-                                    fontWeight="bold"
-                                    onPress={() => {
-                                        const dataSubmit = {
-                                            account_id: form.account_id,
-                                            asset_trading_id: form.asset_trading_id,
-                                            type: form.type,
-                                            type_trigger: form.type_trigger,
-                                            volume: form.volume,
-                                            entry_price: props.price.toString(),
-                                            trigger_price: form.trigger_price,
-                                            percent_take_profit: form.percent_take_profit,
-                                            percent_stop_loss: form.percent_stop_loss,
-                                        }
-                                        mutate(dataSubmit)
-                                    }}
-                                >
-                                    <YStack alignItems="center" justifyContent="center">
-                                        <Paragraph theme="alt2" fontSize="$2" color="#fff">Xác
-                                            nhận {props.tradeType === _TradeType.BUY ? "Mua" : "Bán"} {form.volume} lô</Paragraph>
-                                        <Paragraph theme="alt2" fontSize="$5" fontWeight="500" color="#fff">
-                                            {props.price}
-                                        </Paragraph>
-                                    </YStack>
-                                </Button>
-                            </XStack>
+                            <YStack gap={"$2"}>
+
+                                <XStack gap="$2" alignItems="center" marginTop={"$4"}>
+                                    <Button onPress={() => props.setOpen(false)}>Hủy</Button>
+                                    <Button
+                                        disabled={error.isError}
+                                        flex={1}
+                                        theme={props.tradeType === _TradeType.BUY ? "blue" : "red"}
+                                        backgroundColor={props.tradeType === _TradeType.BUY ?
+                                            (error.isError ? DefaultColor.blue[300] : DefaultColor.blue[500]) :
+                                            (error.isError ? DefaultColor.red[300] : DefaultColor.red[500])}
+                                        color="#fff"
+                                        fontWeight="bold"
+                                        onPress={() => {
+                                            const dataSubmit = {
+                                                account_id: form.account_id,
+                                                asset_trading_id: form.asset_trading_id,
+                                                type: form.type,
+                                                type_trigger: form.type_trigger,
+                                                volume: form.volume,
+                                                entry_price: props.price.toString(),
+                                                trigger_price: form.trigger_price,
+                                                percent_take_profit: form.percent_take_profit,
+                                                percent_stop_loss: form.percent_stop_loss,
+                                            }
+                                            mutate(dataSubmit)
+                                        }}
+                                    >
+                                        <YStack alignItems="center" justifyContent="center">
+                                            <Paragraph theme="alt2" fontSize="$2" color="#fff">Xác
+                                                nhận {props.tradeType === _TradeType.BUY ? "Mua" : "Bán"} {form.volume} lô</Paragraph>
+                                            <Paragraph theme="alt2" fontSize="$5" fontWeight="500" color="#fff">
+                                                {props.price}
+                                            </Paragraph>
+                                        </YStack>
+                                    </Button>
+                                </XStack>
+                            </YStack>
                         </YStack>
                     </TouchableWithoutFeedback>
-                </KeyboardAwareScrollView>
+                </BottomSheetScrollView>
             </BottomSheetView>
         </BottomSheet>
 

@@ -106,15 +106,6 @@ export const AccountCard: FC<Props> = ({account, loading}) => {
                                             </TouchableOpacity>
                                             <Paragraph>Mở</Paragraph>
                                         </YStack>
-                                        <YStack alignItems={"center"} justifyContent={"center"} gap={"$2"}>
-                                            <TouchableOpacity style={[
-                                                DefaultStyle.circleButton,
-                                                {backgroundColor: DefaultColor.slate["200"]}
-                                            ]}>
-                                                <Ionicons name="archive-outline" size={sizeDefault.md} color="black"/>
-                                            </TouchableOpacity>
-                                            <Paragraph>Khôi phục</Paragraph>
-                                        </YStack>
                                     </XStack>
                                 </YStack>
                             )}

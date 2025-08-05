@@ -10,6 +10,7 @@ import {TouchableWithoutFeedback} from "@gorhom/bottom-sheet";
 import {Button, Form, H6, Input, Label, Spinner, XStack, YStack} from "tamagui";
 import {Controller} from "react-hook-form";
 import {AntDesign} from "@expo/vector-icons";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 
 export default function LoginScreen() {
@@ -40,13 +41,14 @@ export default function LoginScreen() {
 
     return (
         <SafeAreaView style={{flex: 1}} edges={['top', 'bottom']}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{flex: 1}}
-                keyboardVerticalOffset={64}
+            <KeyboardAwareScrollView
+                keyboardShouldPersistTaps="handled"
+                enableOnAndroid
+                showsVerticalScrollIndicator={false}
+                scrollEnabled={true}
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <Form gap="$4" padding="$6" onSubmit={handleSubmit(onSubmit)}>
+                    <Form gap="$4" paddingHorizontal="$6" paddingBottom="$6" onSubmit={handleSubmit(onSubmit)}>
                         <YStack gap="$2">
                             <H6 fontWeight="bold">Vui lòng điền địa chỉ email và mật khẩu</H6>
                             <Label htmlFor="email">Email của bạn</Label>
@@ -135,7 +137,7 @@ export default function LoginScreen() {
                         </YStack>
                     </Form>
                 </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
 
     )

@@ -68,6 +68,7 @@ export type RegisterRequest = {
     name: string;
     email: string;
     password: string;
+    ref?: string
 }
 export type FormRegisterType = RegisterRequest & {
     confirm_password: string

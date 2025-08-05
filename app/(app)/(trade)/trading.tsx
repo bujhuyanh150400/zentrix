@@ -14,7 +14,7 @@ import {calculateBidAskSpread} from "@/libs/utils";
 import {showMessage} from "react-native-flash-message";
 import {useAppStore} from "@/services/app/store";
 import {useTransactionTotal} from "@/services/transaction/hook";
-import {ActivityIndicator, Platform, StyleSheet, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, Alert, Platform, StyleSheet, TouchableOpacity, View} from "react-native";
 import {Paragraph, XStack, YStack} from "tamagui";
 import SymbolAssetIcons from "@/components/SymbolAssetIcons";
 import DefaultColor from "@/components/ui/DefaultColor";
@@ -45,6 +45,7 @@ export default function TradingScreen() {
     const [openTransactionSheet, setOpenTransactionSheet] = useState<boolean>(false);
     const [tradeType, setTradeType] = useState<_TradeType>(_TradeType.BUY);
     const {account} =  useGetAccountActive();
+
     const authData = useAuthStore(s => s.auth_data);
     // set loading
     const setLoading = useAppStore(state => state.setLoading);
@@ -233,8 +234,12 @@ export default function TradingScreen() {
                             <XStack width={"100%"} gap={"$2"}>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        setOpenTransactionSheet(true);
-                                        setTradeType(_TradeType.SELL);
+                                        if (account){
+                                            setOpenTransactionSheet(true);
+                                            setTradeType(_TradeType.SELL);
+                                        }else {
+                                            Alert.alert('Bạn cần mở tài khoản', 'Bạn cần mở tài khoản trước để có thể giao dịch được')
+                                        }
                                     }}
                                     style={[
                                         styles.btn_trading, {backgroundColor: DefaultColor.red[500]}
@@ -248,8 +253,12 @@ export default function TradingScreen() {
                                 </View>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        setOpenTransactionSheet(true);
-                                        setTradeType(_TradeType.BUY);
+                                        if (account){
+                                            setOpenTransactionSheet(true);
+                                            setTradeType(_TradeType.BUY);
+                                        }else {
+                                            Alert.alert('Bạn cần mở tài khoản', 'Bạn cần mở tài khoản trước để có thể giao dịch được')
+                                        }
                                     }}
                                     style={[
                                         styles.btn_trading, {backgroundColor: DefaultColor.blue[500]}

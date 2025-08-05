@@ -70,7 +70,6 @@ export const useMutationRegister = ({onSuccess,onError}: {
 export const useQueryGetUserProfile = () => useQuery({
     queryKey: ['authAPI-userProfile'],
     queryFn: authAPI.userProfile,
-    enabled: false,
 })
 
 export const useFormForgotPassword = () => useForm<ForgotPasswordRequest>({
