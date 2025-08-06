@@ -4,6 +4,7 @@ import {
     AssetTradingItemResponse,
     AssetTradingListResponse,
     AssetTradingQueryParams,
+    ConvertUsdRequest, ConvertUsdResponse,
     DeletedFavoriteSymbolsRequest,
     getFavoriteSymbolsResponse,
     SearchSymbolRequest,
@@ -37,6 +38,10 @@ const assetTradingAPI = {
     },
     deletedFavoriteSymbols: async (data: DeletedFavoriteSymbolsRequest): Promise<ResponseSuccessType> => {
         const response = await client.delete(`${defaultURI}/favorite-symbols`, {data});
+        return response.data;
+    },
+    convertUsd: async (params: ConvertUsdRequest): Promise<ConvertUsdResponse> => {
+        const response = await client.get(`${defaultURI}/convert-usd-symbol`, {params});
         return response.data;
     },
 }

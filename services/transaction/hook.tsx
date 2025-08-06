@@ -1,16 +1,25 @@
 import {
     _TransactionStatus,
-    CalculateTransactionPrices, StoreTransactionRequestType,
-    Transaction, TransactionCancelRequestType, TransactionClosedRequestType,
-    TransactionHistoryRequestType, TransactionOpenNowRequestType
+    CalculateTransactionPrices,
+    StoreTransactionRequestType,
+    Transaction,
+    TransactionCancelRequestType,
+    TransactionClosedRequestType,
+    TransactionHistoryRequestType,
+    TransactionOpenNowRequestType
 } from "@/services/transaction/@types";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import transactionAPI from "@/services/transaction/api";
 import {useTransactionHistoryStore, useTransactionStore} from "@/services/transaction/store";
 import {useEffect, useMemo} from "react";
 import {useAuthStore} from "@/services/auth/store";
-import {useSubscribeSymbols} from "@/services/assest_trading/hook";
+import {useGetPriceConvertUsd, useSubscribeSymbols} from "@/services/assest_trading/hook";
 import {useSubscribeSymbolStore} from "@/services/assest_trading/store";
+import {useConfigApp} from "@/services/app/hook";
+import {_ConfigKey} from "@/services/common/@types";
+import {Account} from "@/services/account/@types";
+import {Symbol} from "@/services/assest_trading/@types";
+import {parseToNumber} from "@/libs/utils";
 
 
 export const useTransactionHistory = (params: TransactionHistoryRequestType) => {
@@ -150,3 +159,69 @@ export const useMutationStoreTrans = ({onSuccess,onError}: {
     onSuccess,
     onError,
 })
+
+export const useCalculateInfoTrading = (realTimePrice: number, volume: number, account: Account | null, symbol?: Symbol) => {
+    const {config, getConfig} = useConfigApp(); 
+
+    // phí
+    const configFee = useMemo(() => {
+        const trans_fee = Number(getConfig(_ConfigKey.TRANSACTION_FEE)?.value) || 1
+        const trans_fee_overnight = Number(getConfig(_ConfigKey.TRANSACTION_FEE_OVERNIGHT)?.value) || 1
+        return {
+            trans_fee: trans_fee / 100,
+            trans_fee_overnight: trans_fee_overnight / 100
+        }
+    },[config]);
+
+    // Ký quỹ = (Volume × Giá) / Đòn bẩy
+    const deposit = useMemo(() => {
+        const level = account?.lever;
+        if (level){
+            let leverMax = 1;
+            if (level.max !== null) {
+                leverMax = parseToNumber(level.max);
+                return (realTimePrice * volume)/ leverMax;
+            }
+        }
+        return 0;
+    },[account?.lever, realTimePrice, volume]);
+
+    // Giá chuyển đổi sang USD
+    const quoteCurrency = useMemo(() => {
+        if (symbol){
+            const split = symbol.symbol.split("/");
+            let quoteCurrency = split[1];
+            if (!quoteCurrency) {
+                quoteCurrency = split[0];
+            }
+            return quoteCurrency.toUpperCase();
+        }
+        return null;
+    },[symbol])
+
+    const rateToUsd = useGetPriceConvertUsd(quoteCurrency || '');
+
+    const priceConvert = useMemo(() => {
+        const priceVolume = realTimePrice * volume;
+        // giá tổng là giá + thêm phí giao dịch, phí qua đêm sẽ trừ trên server
+        const totalPrice = priceVolume + configFee.trans_fee * (volume * realTimePrice);
+        // gía convert sang usd
+        const convertPrice = totalPrice * rateToUsd;
+
+        return {
+            totalPrice,
+            convertPrice
+        }
+    }, [rateToUsd, realTimePrice, volume, configFee]);
+
+
+    return {
+        trans_fee: configFee.trans_fee * (volume * realTimePrice),
+        trans_fee_overnight: configFee.trans_fee_overnight * (volume * realTimePrice),
+        deposit,
+        rateToUsd,
+        priceConvert
+    }
+
+
+}

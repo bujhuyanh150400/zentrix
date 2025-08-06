@@ -62,3 +62,11 @@ export type SymbolPrice = {
     price: number;
     percent: number | null;
 };
+
+export type ConvertUsdRequest = {
+    symbol: string;
+}
+
+export type ConvertUsdResponse = {
+    price: string;
+}

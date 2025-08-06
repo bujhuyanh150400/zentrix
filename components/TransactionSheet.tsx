@@ -20,6 +20,7 @@ import DefaultColor from "@/components/ui/DefaultColor";
 import HorizontalTabBar from "@/components/HorizontalTabBar";
 import BottomSheet, {BottomSheetBackdrop, BottomSheetView, BottomSheetScrollView} from '@gorhom/bottom-sheet';
 
+
 const SNAP_CLOSE = 35;
 const SNAP_OPEN = 70;
 
@@ -28,7 +29,6 @@ type TransactionSheetProps = {
     setOpen: Dispatch<SetStateAction<boolean>>,
     tradeType: _TradeType,
     price: number,
-    realtimePrice?: number | null,
     account: Account | null,
     symbol?: Symbol,
 }
@@ -42,6 +42,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const {query} = useTransactionTotal(props.account?.id || null);
     const setLoading = useAppStore(state => state.setLoading);
+
 
     const [form, setForm] = useNestedState<StoreTransactionRequestType>({
         account_id: 0,
@@ -390,7 +391,9 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                                 )}
                             </View>
                             <YStack gap={"$2"}>
+                                <XStack>
 
+                                </XStack>
                                 <XStack gap="$2" alignItems="center" marginTop={"$4"}>
                                     <Button onPress={() => props.setOpen(false)}>Hủy</Button>
                                     <Button

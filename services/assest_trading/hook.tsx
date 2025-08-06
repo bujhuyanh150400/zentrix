@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef} from "react";
+import {useContext, useEffect, useMemo, useRef} from "react";
 import {WebSocketContext} from "@/services/app/socketProvider";
 import {useSubscribeSymbolStore} from "@/services/assest_trading/store";
 import {
@@ -9,6 +9,7 @@ import {
 } from "@/services/assest_trading/@types";
 import {useInfiniteQuery, useMutation, useQuery} from "@tanstack/react-query";
 import assetTradingAPI from "@/services/assest_trading/api";
+import {parseToNumber} from "@/libs/utils";
 
 
 export const useSubscribeSymbols = (symbols: string[], userId?: number, secret?: string, enable:boolean = true) => {
@@ -128,3 +129,14 @@ export const useQueryItemSymbol= (symbol?:string) => useQuery({
     select: (res) => res.data
 })
 
+
+export const useGetPriceConvertUsd = (symbol: string) => {
+    const query = useQuery({
+        queryKey: ['assetTradingAPI-convertUsd', symbol],
+        queryFn: async () => {
+            return await assetTradingAPI.convertUsd({symbol});
+        },
+        select: (res) => res.price
+    });
+    return useMemo(() => query.data ? parseToNumber(query.data) : 0, [query.data]);
+}

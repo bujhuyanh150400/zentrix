@@ -1,5 +1,4 @@
 import {useQuery} from "@tanstack/react-query";
-import assetTradingAPI from "../assest_trading/api";
 import commonAPI from "../common/api";
 import {useAppStore} from "./store";
 import {useEffect} from "react";
