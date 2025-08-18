@@ -8,7 +8,7 @@ export const WS_URL = 'ws://116.118.60.103:5001'; // Thay báº±ng IP backend tháº
 
 export const BACKEND_API_URL = 'http://116.118.60.103/api'
 
-export const BACKEND_REACT_URL = "http://116.118.60.103:5173";
+export const BACKEND_REACT_URL = "http://192.168.0.224:5173/";
 
 export const APP_INFO = {
     name: APP_NAME + ' Trader ',

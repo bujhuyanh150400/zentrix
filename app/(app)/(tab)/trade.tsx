@@ -1,6 +1,6 @@
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import {_AssetType} from "@/services/assest_trading/@types";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo,  useState} from "react";
 import {useAuthStore} from "@/services/auth/store";
 import {useQueryListAssetTrading, useSubscribeSymbols} from "@/services/assest_trading/hook";
 import {useSubscribeSymbolStore} from "@/services/assest_trading/store";

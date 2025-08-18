@@ -196,7 +196,6 @@ export default function ListScreen() {
                                                             onError: (error) => {
                                                                 // eslint-disable-next-line react-hooks/rules-of-hooks
                                                                 useShowErrorHandler(error);
-                                                                console.log(error)
                                                                 setLoading(false);
                                                             }
                                                         });

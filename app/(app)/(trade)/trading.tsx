@@ -45,6 +45,8 @@ export default function TradingScreen() {
     const [openTransactionSheet, setOpenTransactionSheet] = useState<boolean>(false);
     const [tradeType, setTradeType] = useState<_TradeType>(_TradeType.BUY);
     const {account} =  useGetAccountActive();
+    const [loadingChart, setLoadingChart] = useState(false);
+    const [errorChart, setErrorChart] = useState(false);
 
     const authData = useAuthStore(s => s.auth_data);
     // set loading
@@ -63,6 +65,7 @@ export default function TradingScreen() {
     const sendChartPayload = useCallback(() => {
         if (!webViewRef.current || !authData?.user || !symbol) return;
         const payload = {
+            type: "PAYLOAD",
             symbol,
             interval: filter.timeframe,
             chartType: filter.type_chart,
@@ -71,6 +74,14 @@ export default function TradingScreen() {
         };
         webViewRef.current.postMessage(JSON.stringify(payload));
     },[authData?.user, filter.timeframe, filter.type_chart, symbol]);
+
+    const callReloadOpenTrans = useCallback(() => {
+        if (!webViewRef.current) return;
+        const payload = {
+            type: "RELOAD_OPEN_TRANS",
+        };
+        webViewRef.current.postMessage(JSON.stringify(payload));
+    },[])
 
     // // send to web view to handle chart
     useEffect(() => {
@@ -81,7 +92,7 @@ export default function TradingScreen() {
     const {bid, ask, spread} = calculateBidAskSpread(priceRealtime?.price, queryItemSymbol.data ? queryItemSymbol.data.spread : "");
 
     useEffect(() => {
-        if (queryItemSymbol.isError) {
+        if (queryItemSymbol.isError || errorChart) {
             showMessage({
                 type: "danger",
                 message: "Có trục trặc kĩ thuật",
@@ -90,11 +101,11 @@ export default function TradingScreen() {
             })
             router.back();
         }
-    }, [queryItemSymbol.isError]);
+    }, [queryItemSymbol.isError, errorChart]);
 
     useEffect(() => {
-        setLoading(queryItemSymbol.isLoading || queryItemSymbol.isRefetching);
-    }, [queryItemSymbol.isLoading, queryItemSymbol.isRefetching]);
+        setLoading(queryItemSymbol.isLoading || queryItemSymbol.isRefetching || loadingChart);
+    }, [queryItemSymbol.isLoading, queryItemSymbol.isRefetching, loadingChart]);
 
     // call total transaction
     const {query} = useTransactionTotal(account?.id || null);
@@ -103,7 +114,6 @@ export default function TradingScreen() {
             query.refetch();
         }
     }, [account?.id]);
-
 
     return (
         <>
@@ -150,8 +160,7 @@ export default function TradingScreen() {
                                         />
                                     }
                                     <YStack>
-                                        {queryItemSymbol.data ? <Paragraph fontSize={20}
-                                                                           fontWeight={700}>{queryItemSymbol.data.symbol}</Paragraph> :
+                                        {queryItemSymbol.data ? <Paragraph fontSize={20} fontWeight={700}>{queryItemSymbol.data.symbol}</Paragraph> :
                                             <SkeletonFade/>}
                                         {queryItemSymbol.data ? (
                                             <Paragraph fontSize={12} fontWeight={500} color={DefaultColor.slate[400]}
@@ -178,7 +187,9 @@ export default function TradingScreen() {
                     javaScriptEnabled={true}
                     domStorageEnabled={true}
                     startInLoadingState={true}
+                    showsVerticalScrollIndicator={false}
                     style={{flex: 1}}
+                    scrollEnabled={false}
                     onMessage={(event) => {
                         if (event.nativeEvent.data === 'READY') {
                             if (!isWebViewReady) {
@@ -193,6 +204,16 @@ export default function TradingScreen() {
                             } else {
                                 sendChartPayload();
                             }
+                        }
+                        if (event.nativeEvent.data === 'IS_LOADING') {
+                            setLoadingChart(true)
+                        }else if (event.nativeEvent.data === 'IS_NOT_LOADING') {
+                            setLoadingChart(false)
+                        }
+                        if (event.nativeEvent.data === 'IS_ERROR') {
+                            setErrorChart(true)
+                        }else if (event.nativeEvent.data === 'IS_NOT_ERROR') {
+                            setErrorChart(false)
                         }
                     }}
                 />
@@ -278,6 +299,7 @@ export default function TradingScreen() {
                 tradeType={tradeType}
                 open={openTransactionSheet}
                 setOpen={setOpenTransactionSheet}
+                callReloadOpenTrans={callReloadOpenTrans}
                 price={tradeType === _TradeType.BUY ? ask : bid}
             />
         </>

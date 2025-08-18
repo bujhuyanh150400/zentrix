@@ -1,30 +1,44 @@
-export type TransactionType = "withdraw"; // Hiện tại chỉ có rút tiền
+export enum _WalletTransactionType {
+    TYPE_WITHDRAW = 'withdraw',
+    TYPE_AFF_COMMISSION = 'affiliate_commission',
+}
 
-export type TransactionStatus = "success" | "pending" | "failed";
+export enum _WalletTransactionStatus {
+    PENDING_STATUS = 0,
+    APPROVED_STATUS = 1,
+    REJECTED_STATUS = 2,
+}
 
-export interface WalletTransaction {
+export type WalletTransaction = {
     id: number;
-    amount: number;
-    type: TransactionType;
-    createdAt: string;
-    status: TransactionStatus;
-    description: string;
-    bankName: string;
-    accountNumber: string;
-    accountName: string;
-    transactionCode: string;
-    fee: number;
-    failReason?: string;
+    user_id: number;
+    type: _WalletTransactionType;
+    money: number,
+    status:_WalletTransactionStatus,
+    note?:string,
+    affiliate_commission_id?:number,
+    bin_bank?:string,
+    account_bank?:string,
+    account_bank_name?:string,
+    created_at: string
+
 }
 
-export interface WalletData {
-    balance: number; // Số dư hiện tại
-    transactions: WalletTransaction[];
+
+export type WithdrawTransactionWalletRequest = {
+    money: number
 }
 
-// Response từ API
-export interface WalletApiResponse {
-    success: boolean;
-    data: WalletData;
-    message?: string;
+export type ListWalletRequest = {
+    page?: number;
+}
+
+export type ListWalletResponse = {
+    data: WalletTransaction[];
+    meta: {
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
 }

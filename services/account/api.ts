@@ -1,13 +1,13 @@
 import {
     AccountActiveResponse,
-    AccountIdRequest,
+    AccountIdRequest, ActiveProtectAccountRequest,
     CreateAccountRequest,
     EditLeverRequest,
     ListAccountRequest,
     ListAccountResponse,
     ListHistoryRequest,
     ListHistoryResponse,
-    RechargeAccountRequest
+    RechargeAccountRequest, WithdrawAccountRequest
 } from "@/services/account/@types";
 import {client} from "@/libs/client";
 import {ResponseSuccessType} from "@/libs/@type";
@@ -50,6 +50,15 @@ const accountAPI = {
         });
         return response.data;
     },
+    withdraw: async (data: WithdrawAccountRequest): Promise<ResponseSuccessType> => {
+        const response = await client.post('/withdraw-account', data);
+        return response.data;
+    },
+    activeProtectAccount: async (data: ActiveProtectAccountRequest): Promise<ResponseSuccessType> => {
+        const response = await client.post('/active-protect-account', data);
+        return response.data;
+    },
+
 }
 
 export default accountAPI;

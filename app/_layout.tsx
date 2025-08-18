@@ -1,4 +1,3 @@
-import {useFonts} from 'expo-font';
 import {Stack} from 'expo-router';
 import 'react-native-reanimated';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
@@ -9,39 +8,38 @@ import {createTamagui, TamaguiProvider} from "tamagui";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {BottomSheetModalProvider} from "@gorhom/bottom-sheet";
 import FlashMessage from "react-native-flash-message";
+import * as Notifications from 'expo-notifications';
 
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
+    }),
+});
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Set the animation options.
-SplashScreen.setOptions({
-    duration: 1000,
-    fade: true,
-});
 const config = createTamagui(defaultConfig);
 
 export const queryClient = new QueryClient();
 
 export default function RootLayout() {
 
-    const [loaded, error] = useFonts({
-        SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
-    });
-
     useEffect(() => {
-        if (error) throw error;
-    }, [error]);
+        SplashScreen.hideAsync().then(async () => {
+            // grand permission notification
+            await Notifications.requestPermissionsAsync();
+        });
+    }, []);
 
+    // grand permission notification
     useEffect(() => {
-        if (loaded) {
-            SplashScreen.hideAsync();
-        }
-    }, [loaded]);
 
-    if (!loaded) {
-        // Async font loading only occurs in development.
-        return null;
-    }
+    }, []);
+
 
     return (
         <GestureHandlerRootView

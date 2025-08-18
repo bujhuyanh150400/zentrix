@@ -1,7 +1,6 @@
 import {Stack} from "expo-router";
 import HeaderBack from "@/components/HeaderBack";
 
-
 export default function AccountLayout() {
 
     return (
@@ -9,6 +8,12 @@ export default function AccountLayout() {
             {/* Nạp tiền */}
             <Stack.Screen
                 name="recharge"
+                options={{
+                    header: () => <HeaderBack />,
+                }}
+            />
+            <Stack.Screen
+                name="withdraw"
                 options={{
                     header: () => <HeaderBack />,
                 }}

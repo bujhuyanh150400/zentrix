@@ -32,6 +32,7 @@ export default function AppLayout() {
                 <Stack.Screen name="(account)"/>
                 <Stack.Screen name="(info)"/>
                 <Stack.Screen name="(trade)"/>
+                <Stack.Screen name="(new)"/>
             </Stack>
         </WebSocketProvider>
     )

@@ -39,10 +39,19 @@ export default function InfoLayout() {
             <Stack.Screen
                 name="wallet/wallet"
                 options={{
-                    title: "",
-                    headerShown: true,
-                    headerTintColor: DefaultColor.black,
-                    headerBackButtonDisplayMode: "minimal",
+                    header: () => <HeaderBack />,
+                }}
+            />
+            <Stack.Screen
+                name="protectAccount"
+                options={{
+                    header: () => <HeaderBack />,
+                }}
+            />
+            <Stack.Screen
+                name="wallet/withdraw"
+                options={{
+                    header: () => <HeaderBack />,
                 }}
             />
             <Stack.Screen

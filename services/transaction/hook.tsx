@@ -203,8 +203,11 @@ export const useCalculateInfoTrading = (realTimePrice: number, volume: number, a
 
     const priceConvert = useMemo(() => {
         const priceVolume = realTimePrice * volume;
+        const fee = configFee.trans_fee * priceVolume;
+
         // giá tổng là giá + thêm phí giao dịch, phí qua đêm sẽ trừ trên server
-        const totalPrice = priceVolume + configFee.trans_fee * (volume * realTimePrice);
+        const totalPrice = priceVolume + fee;
+
         // gía convert sang usd
         const convertPrice = totalPrice * rateToUsd;
 
@@ -220,7 +223,8 @@ export const useCalculateInfoTrading = (realTimePrice: number, volume: number, a
         trans_fee_overnight: configFee.trans_fee_overnight * (volume * realTimePrice),
         deposit,
         rateToUsd,
-        priceConvert
+        priceConvert,
+        account
     }
 
 

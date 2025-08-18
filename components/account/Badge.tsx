@@ -97,14 +97,14 @@ const BadgeAccount = () => {
                                         if ((account?.type === _AccountType.TEST_ACCOUNT)
                                             || (account?.type === _AccountType.REAL_ACCOUNT && userProfile?.status === _VerifyUserStatus.ACTIVE)
                                         ) {
-                                            router.push('/(app)/(account)/recharge')
+                                            router.push('/(app)/(account)/withdraw')
                                         }else {
                                             Alert.alert('Tài khoản cần xác thực', 'Bạn cần xác thực tài khoản để rút tiền')
                                         }
                                     }}
                                 >
                                     <XStack alignItems={"center"} gap={"$2"}>
-                                        <Feather name="arrow-down-circle" size={sizeDefault.xl} color="black" style={{transform : [{rotate: '240deg'}]}} />
+                                        <Feather name="arrow-up-circle" size={sizeDefault.xl} color="black" style={{transform : [{rotate: '240deg'}]}} />
                                         <Paragraph fontWeight={700}>Rút tiền</Paragraph>
                                     </XStack>
                                 </TouchableOpacity>

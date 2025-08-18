@@ -54,7 +54,11 @@ export const calculateProfit = (price: number, percent: string, volume: string, 
     }
 }
 
-export function generateUniqueIdRecharge(): string {
+export function generateUniqueIdRecharge(prefix :string = 'NAP'): string {
     const uniquePart = Date.now().toString(16) + Math.floor(Math.random() * 1000000).toString(16);
     return ('NAP' + uniquePart).toUpperCase();
 }
+
+export const removeHTMLTags = (text: string) => {
+    return text.replace(/<[^>]+>/g, ''); // Biểu thức chính quy để loại bỏ thẻ HTML
+};

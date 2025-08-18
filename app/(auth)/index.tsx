@@ -2,10 +2,12 @@ import {useAssets} from "expo-asset";
 import {useVideoPlayer, VideoView} from "expo-video";
 import {StyleSheet, View, Text} from "react-native";
 import {APP_NAME} from "@/libs/constant_env";
-import {Link} from "expo-router";
+import {router} from "expo-router";
 import {TouchableOpacity} from "@gorhom/bottom-sheet";
 import {sizeDefault} from "@/components/ui/DefaultStyle";
 import useDisableBackGesture from "@/hooks/useDisableBackGesture";
+import DefaultColor from "@/components/ui/DefaultColor";
+import {Paragraph} from "tamagui";
 
 
 export default function OnboardScreen() {
@@ -37,24 +39,26 @@ export default function OnboardScreen() {
                 <Text style={styles.header}>Sẵn sàng để thay đổi cách bạn kiếm tiền?</Text>
             </View>
             <View style={styles.buttons}>
-                <Link
-                    href={'/(auth)/login'}
+                <TouchableOpacity
                     style={[styles.button,{
-                        backgroundColor: '#141518'
+                        backgroundColor: DefaultColor.slate[600]
                     }]}
-                    asChild>
-                    <TouchableOpacity>
-                        <Text style={{ color: 'white', fontSize: 18, fontWeight: '500' }}>Đăng nhập</Text>
-                    </TouchableOpacity>
-                </Link>
-                <Link
-                    href={'/(auth)/register'}
-                    style={[styles.button, { backgroundColor: '#fff' }]}
-                    asChild>
-                    <TouchableOpacity >
-                        <Text style={{ fontSize: sizeDefault["lg"], fontWeight: 500 }}>Đăng ký</Text>
-                    </TouchableOpacity>
-                </Link>
+                    onPress={() => {
+                        router.push('/(auth)/login')
+                    }}>
+                    <Paragraph style={{ fontSize: sizeDefault["lg"], fontWeight: 500 , color: DefaultColor.white}}>
+                        Đăng nhập
+                    </Paragraph>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.button,{
+                        backgroundColor: DefaultColor.white
+                    }]}
+                    onPress={() => {
+                        router.push('/(auth)/register')
+                    }}>
+                    <Paragraph style={{ fontSize: sizeDefault["lg"], fontWeight: 500 }}>Đăng ký</Paragraph>
+                </TouchableOpacity>
             </View>
         </View>
     )
@@ -94,8 +98,7 @@ const styles = StyleSheet.create({
     button: {
         padding: 10,
         height: 50,
-        flex: 1,
-        borderRadius: 40,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
     }

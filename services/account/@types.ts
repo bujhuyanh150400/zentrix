@@ -9,7 +9,9 @@ export type AccountType = {
     max: string; // số tiền tối đa để mở tài khoản
     difference: string; // số tiền chênh lệch giữa các loại tài khoản
     commission: string; // hoa hồng giao dịch
-    color?: string
+    color?: string;
+    max_withdraw_per_day?: number;
+    max_withdraw_amount_per_day?: number;
 };
 
 export type CurrencyType = {
@@ -42,6 +44,10 @@ export enum _AccountStatus {
     ACTIVE = 1,
     IN_ACTIVE = 2
 }
+export enum _AccountActiveProtectCost {
+    ACTIVE = 1,
+    IN_ACTIVE = 0
+}
 export type CreateAccountRequest = {
     name: string;// tên tài khoản
     password: string; // mật khẩu tài khoản
@@ -68,6 +74,7 @@ export type Account = {
     updated_at: string;
     deleted_at: string | null;
     user_id: number;
+    active_protect_cost: _AccountActiveProtectCost
     account_type: AccountType;
     lever: Lever
 };
@@ -152,3 +159,15 @@ export type UseGetAccountActiveHookType = {
     loading: boolean;
     error: AxiosError | null;
 };
+
+
+export type WithdrawAccountRequest = {
+    account_id: number; // id tài khoản
+    money: number; // số tiền rút tài khoản
+    transaction_code: string // mã giao dịch, nếu là account real,
+    amount_vnd: number, // gía chuyển đổi
+}
+
+export type ActiveProtectAccountRequest = {
+    account_id: number; // id tài khoản
+}

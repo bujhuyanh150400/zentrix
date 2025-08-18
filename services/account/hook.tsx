@@ -2,13 +2,13 @@ import {AxiosError} from "axios";
 import {
     _AccountType,
     Account,
-    AccountActiveResponse, AccountIdRequest,
+    AccountActiveResponse, AccountIdRequest, ActiveProtectAccountRequest,
     CreateAccountRequest,
     EditLeverRequest,
     ListAccountRequest, ListHistoryRequest,
     RechargeAccountForm,
     RechargeAccountRequest,
-    UseGetAccountActiveHookType
+    UseGetAccountActiveHookType, WithdrawAccountRequest
 } from "@/services/account/@types";
 import {useAddAccountStore} from "@/services/account/store";
 import {useInfiniteQuery, useMutation, useQuery} from "@tanstack/react-query";
@@ -169,3 +169,31 @@ export const useInfiniteHistoryList = (queryParams: ListHistoryRequest) => {
         initialPageParam: 1,
     });
 };
+
+export const useWithdrawAccountForm = () => {
+    return useForm<WithdrawAccountRequest>({
+        resolver: yupResolver(yup.object({
+            account_id: yup.number().required(),
+            money: yup
+                .number()
+                .typeError('Số tiền phải là số')
+                .required('Số tiền là bắt buộc'),
+            transaction_code: yup.string().required(),
+            amount_vnd: yup.number().required()
+        })),
+    });
+}
+
+export const useMutationWithdraw = ({onSuccess,onError}: {
+    onSuccess: () => Promise<void>;
+    onError: (error: any) => void;
+}) => useMutation({
+    mutationFn: (data: WithdrawAccountRequest) => accountAPI.withdraw(data),
+    onSuccess,
+    onError
+});
+
+
+export const useMutationActiveProtectAccount = () => useMutation({
+    mutationFn: (data: ActiveProtectAccountRequest) => accountAPI.activeProtectAccount(data),
+});

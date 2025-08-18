@@ -24,6 +24,7 @@ import SymbolAssetIcons from "@/components/SymbolAssetIcons";
 import SkeletonFade from "@/components/SkeletonFade";
 import { showMessage } from "react-native-flash-message";
 import { useShowErrorHandler } from "@/hooks/useHandleError";
+import {useGetAccountActive} from "@/services/account/hook";
 
 
 type Props = {
@@ -253,10 +254,12 @@ const SymbolAndInfo: FC<{item: CalculateTransactionPrices}> = ({item}) => (
                                color={item.type === _TradeType.BUY ? DefaultColor.blue[500] : DefaultColor.red[500]}>
                         {item.type === _TradeType.BUY ? 'Mua' : 'Bán'} {item.volume.toFixed(2)} lô
                     </Paragraph>
-                    <Paragraph fontSize={14} fontWeight={500}
-                               color={DefaultColor.slate[400]}>
-                        at {item.entry_price.toFixed(2)}
-                    </Paragraph>
+                    {item.entry_price &&
+                        <Paragraph fontSize={14} fontWeight={500}
+                                   color={DefaultColor.slate[400]}>
+                            at {item.entry_price.toFixed(2)}
+                        </Paragraph>
+                    }
                 </XStack>
             </YStack>
         </XStack>
@@ -283,13 +286,13 @@ const SymbolAndInfo: FC<{item: CalculateTransactionPrices}> = ({item}) => (
                         {item.trigger_price ? (
                             <Paragraph fontSize={14} fontWeight={500}
                                        color={DefaultColor.slate[400]}>
-                                open {item.trigger_price.toFixed(2)}
+                                open when {item.trigger_price.toFixed(2)}
                             </Paragraph>
                         ) : <SkeletonFade/>}
                         {item.realtime_price ? (
                             <Paragraph fontSize={14} fontWeight={500}
                                        color={DefaultColor.slate[400]}>
-                                {item.realtime_price.toFixed(2)}
+                                now {item.realtime_price.toFixed(2)}
                             </Paragraph>
                         ) : <SkeletonFade/>}
                     </>
@@ -321,9 +324,12 @@ const TransactionInfoSheet: FC<{
         if (!open) item.current = null;
     }, [item, setOpen]);
 
+    const accountHook = useGetAccountActive();
+
     const mutationCloseTrans = useMutationCloseTrans({
         onSuccess: async () => {
             query.refetch();
+            accountHook.get();
             onClosed(false);
             showMessage({
                 message: "Chốt giao dịch thành công",
@@ -332,6 +338,7 @@ const TransactionInfoSheet: FC<{
             });
         },
         onError: (error) => {
+            console.log(error)
             // eslint-disable-next-line react-hooks/rules-of-hooks
             useShowErrorHandler({error});
         }
@@ -426,16 +433,14 @@ const TransactionInfoSheet: FC<{
 
     return (
         <Sheet
-            forceRemoveScrollEnabled={true}
             modal={true}
             open={open}
             onOpenChange={(open: boolean) => {
                 onClosed(open);
             }}
-            snapPointsMode={"fit"}
+            snapPoints={[70]}
             dismissOnSnapToBottom
-            zIndex={200_000}
-            animation={"fast"}
+            zIndex={100_000}
         >
             <Sheet.Overlay
                 animation="lazy"
@@ -477,7 +482,7 @@ const TransactionInfoSheet: FC<{
                         <XStack alignItems={"center"} justifyContent={"space-between"}>
                             <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Giá mở:</Paragraph>
                             <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.entry_price.toFixed(2)}
+                                {data.entry_price ? data.entry_price.toFixed(2) : '__'}
                             </Paragraph>
                         </XStack>
                         {/*Giá đóng*/}
@@ -532,9 +537,9 @@ const TransactionInfoSheet: FC<{
                                 {data.take_profit ? data.take_profit.toFixed(2) : '__'}
                             </Paragraph>
                         </XStack>
+
                         {data.status === _TransactionStatus.OPEN && (
                             <Button
-                                flex={1}
                                 disabled={mutationCloseTrans.isPending}
                                 marginTop={"$2"}
                                 onPress={() => {

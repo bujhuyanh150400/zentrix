@@ -32,7 +32,6 @@ export default function InfoScreen() {
 
     const logout = useAuthStore((state) => state.logout);
 
-
     return (
         <>
             <LayoutScrollApp title="Hồ sơ">
@@ -203,7 +202,7 @@ export default function InfoScreen() {
                                 </XStack>
                             </XStack>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={maintainWarning}>
+                        <TouchableOpacity onPress={() => router.push("/(app)/(info)/protectAccount")}>
                             <XStack
                                 alignItems="center"
                                 justifyContent="space-between"

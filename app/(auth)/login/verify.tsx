@@ -46,7 +46,7 @@ export default function VerifyScreen() {
         setValue: setPin,
     });
 
-    const {refetch, isLoading, isSuccess, isError, data} = useQueryGetUserProfile();
+    const {refetch, isLoading, isSuccess, isError, data} = useQueryGetUserProfile(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -107,7 +107,7 @@ export default function VerifyScreen() {
         } else if (isError) {
             logoutError('Thông tin xác thực của bạn hiện không đúng, vui lòng đăng nhập lại');
         }
-    }, [isSuccess, isError, data, verify, logoutError]);
+    }, [isSuccess, isError, data]);
 
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: "#fff"}}>

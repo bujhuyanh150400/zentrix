@@ -3,7 +3,7 @@ import {Card, Paragraph, View, XStack, YStack} from "tamagui";
 import DefaultColor from "@/components/ui/DefaultColor";
 import {_AccountType, Account} from "@/services/account/@types";
 import BottomSheet, {TouchableOpacity} from "@gorhom/bottom-sheet";
-import {Entypo, Feather, FontAwesome6, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
+import {Entypo, Feather, FontAwesome6, MaterialCommunityIcons} from "@expo/vector-icons";
 import DefaultStyle, {sizeDefault} from "@/components/ui/DefaultStyle";
 import {Alert, StyleSheet, Text} from "react-native";
 import SkeletonFade from "@/components/SkeletonFade";
@@ -77,7 +77,7 @@ export const AccountCard: FC<Props> = ({account, loading}) => {
                                             </View>
                                         </XStack>
                                         <Text style={styles.money}>
-                                            {account.money.toFixed(2)} USD
+                                            {account.money.toLocaleString('en-US')} USD
                                         </Text>
                                     </YStack>
                                     <StackButtonAccountReal account={account} userProfile={userProfile} showDetail={true}/>
@@ -157,7 +157,7 @@ export const StackButtonAccountReal: FC<StackButtonAccountRealPropsType> = ({acc
                             if ((account?.type === _AccountType.TEST_ACCOUNT)
                                 || (account?.type === _AccountType.REAL_ACCOUNT && userProfile?.status === _VerifyUserStatus.ACTIVE)
                             ) {
-                                router.push('/(app)/(account)/recharge')
+                                router.push('/(app)/(account)/withdraw')
                             }else {
                                 Alert.alert('Tài khoản cần xác thực', 'Bạn cần xác thực tài khoản để rút tiền')
                             }
