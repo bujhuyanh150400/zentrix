@@ -75,6 +75,12 @@ export type Transaction = {
     "open_at": string | null, // ISO 8601 format
     "trigger_at": string | null, // ISO 8601 format
     "close_at": string | null, // ISO 8601 format
+    "rate_to_usd": number,
+    "level": number | null,
+    "entry_price_convert": number,
+    "close_price_convert" : number | null,
+    "fee": number,
+    "fee_overnight": number,
     symbol: Symbol
 }
 
@@ -104,6 +110,7 @@ export type TransactionCancelRequestType = {
 
 export type CalculateTransactionPrices = Transaction & {
     profit?: number;
+    real_time_profit?: number;
     realtime_price?: number;
     entry_volume_price?: number;
     realtime_volume_price?: number;

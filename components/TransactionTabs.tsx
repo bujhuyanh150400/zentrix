@@ -51,6 +51,7 @@ const TransactionTabs: FC<Props> = (props) => {
 
     const transactionsData = transactions[filter.status] || [];
 
+
     const hookCalculate = useCalculateTransactionPrices(transactionsData, filter.status === _TransactionStatus.OPEN || filter.status === _TransactionStatus.WAITING);
 
     useEffect(() => {
@@ -177,7 +178,15 @@ const TransactionTabs: FC<Props> = (props) => {
                                     <XStack gap={"$1"}>
                                         <Paragraph fontWeight={700} color={DefaultColor.slate[400]}>Lãi/Lỗ:</Paragraph>
                                         <Paragraph fontWeight={700}
-                                                   color={hookCalculate.total > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>{hookCalculate.total.toFixed(2)}</Paragraph>
+                                                   color={hookCalculate.total > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>
+                                            {hookCalculate.total.toFixed(2)}
+                                        </Paragraph>
+                                        <Separator vertical marginHorizontal={10}/>
+                                        <Paragraph fontWeight={700} color={DefaultColor.slate[400]}>Lãi/Lỗ sau tính:</Paragraph>
+                                        <Paragraph fontWeight={700}
+                                                   color={hookCalculate.total_real > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>
+                                            {hookCalculate.total_real.toFixed(2)}
+                                        </Paragraph>
                                     </XStack>
                                 )}
 
@@ -438,7 +447,7 @@ const TransactionInfoSheet: FC<{
             onOpenChange={(open: boolean) => {
                 onClosed(open);
             }}
-            snapPoints={[70]}
+            snapPoints={[90]}
             dismissOnSnapToBottom
             zIndex={100_000}
         >
@@ -502,6 +511,15 @@ const TransactionInfoSheet: FC<{
                                 </Paragraph>
                             ) : <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>__</Paragraph>}
                         </XStack>
+                        <XStack alignItems={"center"} justifyContent={"space-between"}>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Lỗ/Lãi sau tính:</Paragraph>
+                            {data.real_time_profit ? (
+                                <Paragraph fontWeight={500}
+                                           color={data.real_time_profit > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>
+                                    {data.real_time_profit.toFixed(2)}
+                                </Paragraph>
+                            ) : <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>__</Paragraph>}
+                        </XStack>
                         {/*Thời gian mở*/}
                         <XStack alignItems={"center"} justifyContent={"space-between"}>
                             <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Thời gian mở:</Paragraph>
@@ -537,6 +555,34 @@ const TransactionInfoSheet: FC<{
                                 {data.take_profit ? data.take_profit.toFixed(2) : '__'}
                             </Paragraph>
                         </XStack>
+                        {/* Phí */}
+                        <XStack alignItems={"center"} justifyContent={"space-between"}>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Phí</Paragraph>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                {data.fee ? data.fee.toFixed(2) : '__'}
+                            </Paragraph>
+                        </XStack>
+                        <XStack alignItems={"center"} justifyContent={"space-between"}>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Phí qua đêm</Paragraph>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                {data.fee_overnight ? data.fee_overnight.toFixed(2) : '__'}
+                            </Paragraph>
+                        </XStack>
+                        {/* Đòn bẩy */}
+                        <XStack alignItems={"center"} justifyContent={"space-between"}>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Đòn bẩy</Paragraph>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                {data.level ? `1:${data.level}` : '__'}
+                            </Paragraph>
+                        </XStack>
+                        {/* Tỉ giá chuyển đổi USD */}
+                        <XStack alignItems={"center"} justifyContent={"space-between"}>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Tỉ giá chuyển đổi USD</Paragraph>
+                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                {data.rate_to_usd ? `${data.rate_to_usd.toFixed(2)} USD` : '__'}
+                            </Paragraph>
+                        </XStack>
+
 
                         {data.status === _TransactionStatus.OPEN && (
                             <Button

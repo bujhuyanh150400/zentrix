@@ -90,10 +90,18 @@ export const useCalculateTransactionPrices = (transaction: Transaction[], enable
                 const realtimeVolumePrice = symbolPrice.price * item.volume;
                 if (item.status === _TransactionStatus.OPEN){
                     const profit = (realtimeVolumePrice - entryVolumePrice);
+                    const profitRateToUSD = (realtimeVolumePrice - entryVolumePrice) * item.rate_to_usd;
+                    const percentProfitLoss = (profitRateToUSD) / 100;
+                    const level = item.level ? item.level : 10000;
+
+                    const realTimeProfit = (entryVolumePrice * level * percentProfitLoss);
+
                     acc.total += profit;
+                    acc.total_real += realTimeProfit;
                     acc.data.push({
                         ...item,
                         profit: profit,
+                        real_time_profit: realTimeProfit,
                         realtime_price: symbolPrice.price,
                         entry_volume_price: entryVolumePrice,
                         realtime_volume_price: realtimeVolumePrice,
@@ -109,14 +117,22 @@ export const useCalculateTransactionPrices = (transaction: Transaction[], enable
                 const entryVolumePrice = item.entry_price * item.volume;
                 const closedVolumePrice = item.close_price * item.volume;
                 const profit = (closedVolumePrice - entryVolumePrice);
+                const profitRateToUSD = (closedVolumePrice - entryVolumePrice) * item.rate_to_usd;
+                const percentProfitLoss = (profitRateToUSD) / 100;
+                const level = item.level ? item.level : 10000;
+
+                const realTimeProfit = (entryVolumePrice * level * percentProfitLoss);
+
                 acc.data.push({
                     ...item,
                     profit: profit,
+                    real_time_profit: realTimeProfit,
                 });
             }
             return acc;
         }, {
             total: 0,
+            total_real: 0,
             data: [] as CalculateTransactionPrices[]
         })
     },[prices, transaction])
