@@ -13,7 +13,13 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Ứng dụng cần sử dụng camera để chụp ảnh CCCD.",
         "NSPhotoLibraryUsageDescription": "Ứng dụng cần truy cập thư viện ảnh để chọn ảnh CCCD.",
-        "NSPhotoLibraryAddUsageDescription": "Ứng dụng cần quyền ghi ảnh vào thư viện."
+        "NSPhotoLibraryAddUsageDescription": "Ứng dụng cần quyền ghi ảnh vào thư viện.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "116.118.60.103": { "NSIncludesSubdomains": true, "NSTemporaryExceptionAllowsInsecureHTTPLoads": true }
+          }
+        }
       }
     },
     "android": {
@@ -21,7 +27,13 @@
         "foregroundImage": "./assets/images/zentrix_logo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "edgeToEdgeEnabled": true,
+      "package": "zentrix.testfile.apk"
     },
     "web": {
       "bundler": "metro",
@@ -53,6 +65,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "aebe04ed-331e-4b08-a778-9913a252bf1e"
+      }
     }
   }
 }

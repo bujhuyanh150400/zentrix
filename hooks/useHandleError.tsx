@@ -26,8 +26,10 @@ export function useApiErrorHandler<T extends FieldValues>() {
                 });
             }
         } else {
+            let errorHandler = error as Error;
             showMessage({
-                message: 'Đã xảy ra lỗi không xác định, vui lòng thử lại sau',
+                // message: 'Đã xảy ra lỗi không xác định, vui lòng thử lại sau',
+                message: errorHandler?.message,
                 type: 'danger',
                 duration: 3000,
             });

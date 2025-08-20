@@ -93,6 +93,7 @@ export default function TradingScreen() {
 
     useEffect(() => {
         if (queryItemSymbol.isError || errorChart) {
+            setLoading(false);
             showMessage({
                 type: "danger",
                 message: "Có trục trặc kĩ thuật",
