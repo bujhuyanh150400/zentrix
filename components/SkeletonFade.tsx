@@ -37,7 +37,7 @@ const SkeletonFade:FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
     skeleton: {
-        backgroundColor: DefaultColor.slate[200],
+        backgroundColor: DefaultColor.slate[300],
         borderRadius: 4,
     },
 });

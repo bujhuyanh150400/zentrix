@@ -47,22 +47,7 @@ export const pinStyles = StyleSheet.create({
 export const appTabStyle = StyleSheet.create({
     tabBarStyle: {
         backgroundColor: DefaultColor.white,
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-
         borderTopWidth: 0,
-        // SHADOW cho iOS
-        shadowColor: DefaultColor.black,
-        shadowOffset: {
-            width: 0,
-            height: -1,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        // SHADOW cho Android
-        elevation: 10,
     }
 });
 

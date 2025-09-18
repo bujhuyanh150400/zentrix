@@ -3,6 +3,8 @@ import {Animated, View, Image, Text} from "react-native";
 import {useAuthStore} from "@/services/auth/store";
 import {checkLogin} from "@/services/auth/hook";
 import {APP_NAME} from "@/libs/constant_env";
+import {_AuthStatus} from "@/services/auth/@type";
+import {router} from "expo-router";
 
 
 export default function SplashedScreen() {
@@ -25,8 +27,14 @@ export default function SplashedScreen() {
                 useNativeDriver: true,
             }),
         ]).start();
-        const duration = setTimeout(() => {
-            checkLogin(hydrate).catch()
+        const duration = setTimeout(async () => {
+            await hydrate()
+            const freshStatus = useAuthStore.getState().status
+            if (freshStatus === _AuthStatus.NEED_ACCESS_PIN) {
+                router.replace('/(auth)/login/verify');
+            } else {
+                router.replace('/(auth)');
+            }
         },2000);
 
         return () => {

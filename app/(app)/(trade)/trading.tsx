@@ -191,6 +191,9 @@ export default function TradingScreen() {
                     showsVerticalScrollIndicator={false}
                     style={{flex: 1}}
                     scrollEnabled={false}
+                    onError={() => {
+                        setErrorChart(true)
+                    }}
                     onMessage={(event) => {
                         if (event.nativeEvent.data === 'READY') {
                             if (!isWebViewReady) {

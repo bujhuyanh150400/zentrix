@@ -20,7 +20,7 @@ type Props = {
 
 export const AccountCard: FC<Props> = ({account, loading}) => {
     const [openSheet, setOpenSheet] = useState<boolean>(false);
-
+    console.log(account)
     const userProfileQuery = useQueryGetUserProfile();
 
     const userProfile = userProfileQuery?.data || null;
@@ -72,7 +72,7 @@ export const AccountCard: FC<Props> = ({account, loading}) => {
                                                 }
                                             ]}>
                                                 <Text>
-                                                    {account.account_type.name}
+                                                    {account.account_type.description}
                                                 </Text>
                                             </View>
                                         </XStack>

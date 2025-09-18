@@ -3,7 +3,7 @@ import {WebSocketContext} from "@/services/app/socketProvider";
 import {useSubscribeSymbolStore} from "@/services/assest_trading/store";
 import {
     _AssetType,
-    AddFavoriteSymbolsRequest,
+    AddFavoriteSymbolsRequest, AssetTradingQueryParams,
     DeletedFavoriteSymbolsRequest,
     SearchSymbolRequest
 } from "@/services/assest_trading/@types";
@@ -77,6 +77,13 @@ export const useQueryListAssetTrading = (activeTab: _AssetType) => useQuery({
     queryFn: async () => assetTradingAPI.list({type: activeTab}),
     enabled: false,
 });
+
+export const useQueryListAssetTradingParams = (params: AssetTradingQueryParams) => useQuery({
+    queryKey: ['assetTradingAPI-list', params],
+    queryFn: async () => assetTradingAPI.list(params),
+    enabled: true,
+});
+
 
 export const useQueryFavoriteSymbolQuery = () => useQuery({
     queryKey: ['assetTradingAPI-getFavoriteSymbols'],

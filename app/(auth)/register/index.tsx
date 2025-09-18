@@ -153,7 +153,7 @@ export default function RegisterScreen() {
                                                 {showPassword ? (
                                                     <AntDesign name="unlock" size={18} color="black"/>
                                                 ) : (
-                                                    <AntDesign name="lock1" size={18} color="black"/>
+                                                    <AntDesign name="lock" size={18} color="black"/>
                                                 )}
                                             </XStack>
                                         </XStack>
@@ -196,7 +196,7 @@ export default function RegisterScreen() {
                                                 {showPasswordConfirm ? (
                                                     <AntDesign name="unlock" size={18} color="black"/>
                                                 ) : (
-                                                    <AntDesign name="lock1" size={18} color="black"/>
+                                                    <AntDesign name="lock" size={18} color="black"/>
                                                 )}
                                             </XStack>
                                         </XStack>

@@ -1,6 +1,8 @@
 const DefaultColor = {
     white: "#ffffff",
     black: "#000000",
+    primary_color:"#C58E27",
+    primary_bg: "#EAF6FF",
     slate: {
         50: '#f8fafc',
         100: '#f1f5f9',

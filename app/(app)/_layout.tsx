@@ -25,7 +25,7 @@ export default function AppLayout() {
                 initialRouteName="(tab)"
                 screenOptions={{
                     headerShown: false,
-                    contentStyle: { backgroundColor: DefaultColor.white },
+                    contentStyle: { backgroundColor: DefaultColor.primary_bg },
                 }}
             >
                 <Stack.Screen name="(tab)"/>

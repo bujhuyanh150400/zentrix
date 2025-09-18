@@ -93,7 +93,7 @@ export default function TradeListScreen() {
                                     flexDirection: "row"
                                 }}
                                 >
-                                    <AntDesign name="staro" size={16} color={
+                                    <AntDesign name="star" size={16} color={
                                         isActive ? DefaultColor.yellow[600] : DefaultColor.slate[300]
                                     }/>
                                     <Paragraph

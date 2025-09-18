@@ -451,7 +451,7 @@ export default function InfoScreen() {
                             >
                                 <XStack alignItems="center" gap="$4">
                                     <View style={style.box_icon}>
-                                        <AntDesign name="like2" size={18} color="black" />
+                                        <AntDesign name="like" size={18} color="black" />
                                     </View>
                                     <YStack>
                                         <Paragraph>Đánh giá ứng dụng</Paragraph>
@@ -484,7 +484,7 @@ export default function InfoScreen() {
                             >
                                 <XStack alignItems="center" gap="$4">
                                     <View style={style.box_icon}>
-                                        <AntDesign name="infocirlceo" size={18} color="black" />
+                                        <AntDesign name="info-circle" size={18} color="black" />
                                     </View>
                                     <YStack>
                                         <Paragraph>Giới thiệu ứng dụng</Paragraph>

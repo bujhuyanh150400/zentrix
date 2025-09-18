@@ -221,7 +221,7 @@ const AddAccountView: FC<Props> = (props) => {
                                     >
                                         <Card.Header padded alignItems="center">
                                             <H2 fontWeight={700} marginBottom="$2" textAlign="center">
-                                                {item.name}
+                                                {item.description}
                                             </H2>
                                             <View
                                                 style={{
@@ -236,19 +236,12 @@ const AddAccountView: FC<Props> = (props) => {
                                                     marginTop: 8,
                                                 }}
                                             >
-                                                <AntDesign name="checkcircleo" size={20} color="black"/>
-                                                <Paragraph theme="alt2">{item.summary}</Paragraph>
+                                                <AntDesign name="check-circle" size={20} color="black"/>
+                                                <Paragraph theme="alt2" fontSize={12}>{item.summary}</Paragraph>
                                             </View>
                                         </Card.Header>
                                         <Card.Footer padded>
                                             <YStack gap="$2">
-                                                <Paragraph
-                                                    theme="alt2"
-                                                    textAlign="center"
-                                                    style={{marginBottom: 12}}
-                                                >
-                                                    {item.description}
-                                                </Paragraph>
                                                 <Separator marginVertical={8}/>
                                                 <XStack justifyContent="space-between" width="100%">
                                                     <Paragraph color="#7a7f83" fontWeight={500}>Tiền nạp tối

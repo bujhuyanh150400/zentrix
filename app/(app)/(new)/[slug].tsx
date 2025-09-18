@@ -5,7 +5,7 @@ import LayoutScrollApp from "@/components/LayoutScrollApp";
 import {Paragraph, Separator, XStack, YStack} from "tamagui";
 import {Image, Text, useWindowDimensions} from "react-native";
 import {useAppStore} from "@/services/app/store";
-import RenderHtml, {HTMLSource} from 'react-native-render-html';
+import RenderHtml from 'react-native-render-html';
 import {sizeDefault} from "@/components/ui/DefaultStyle";
 import DefaultColor from "@/components/ui/DefaultColor";
 
@@ -15,7 +15,6 @@ export default function SlugScreen(){
     const query = useNewDetailQuery({slug: slug || ''});
     const [imageError, setImageError] = useState(false);
     const setLoading = useAppStore(state => state.setLoading);
-    const { width } = useWindowDimensions();
 
     useEffect(() => {
         setLoading(query.isLoading || query.isRefetching);

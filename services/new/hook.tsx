@@ -20,6 +20,12 @@ export const useInfiniteNewsContentQuery = (queryParams: NewListRequest) => {
     });
 };
 
+export const useNewsListQuery = (queryParams: NewListRequest) => useQuery({
+    queryKey: ['newAPI-list', queryParams],
+    enabled: true,
+    queryFn: async () => newAPI.list(queryParams),
+    select: (res) => res.data,
+});
 
 export const useNewDetailQuery = (params: NewDetailRequest) =>  useQuery({
     queryKey: ['newAPI-detail', params],

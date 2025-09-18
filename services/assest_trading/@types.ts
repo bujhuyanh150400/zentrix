@@ -15,6 +15,7 @@ export type Symbol = {
 
 export type AssetTradingQueryParams = {
     type?: _AssetType;
+    limit?: number
 };
 
 export type AssetTradingListResponse = {

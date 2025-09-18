@@ -2,10 +2,7 @@ import DefaultColor from "@/components/ui/DefaultColor";
 import {Tabs} from "expo-router";
 import {BlurView} from "expo-blur";
 import {appTabStyle} from "@/components/ui/DefaultStyle";
-import {AntDesign, FontAwesome6, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
-
-
-
+import {FontAwesome6,  FontAwesome5} from "@expo/vector-icons";
 
 export default function AppTabLayout(){
     return (
@@ -13,7 +10,7 @@ export default function AppTabLayout(){
             initialRouteName="index"
             screenOptions={{
                 headerShown: false,
-                tabBarActiveTintColor: DefaultColor.black,
+                tabBarActiveTintColor: DefaultColor.primary_color,
                 tabBarBackground: () => (
                     <BlurView
                         intensity={100}
@@ -25,8 +22,6 @@ export default function AppTabLayout(){
                     />
                 ),
                 tabBarItemStyle: {
-                    // paddingVertical: 8,
-                    // paddingHorizontal: 16,
                 },
                 tabBarLabelStyle: {
                 },
@@ -39,9 +34,9 @@ export default function AppTabLayout(){
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: 'Tài khoản',
+                    title: 'Home',
                     tabBarIcon: (props) =>
-                        <MaterialCommunityIcons name="view-dashboard-outline" size={props.size} color={props.color} />
+                        <FontAwesome5 name="home" size={props.size} color={props.color} />
                 }}
             />
             <Tabs.Screen
@@ -49,15 +44,15 @@ export default function AppTabLayout(){
                 options={{
                     title: 'Giao dịch',
                     tabBarIcon: (props) =>
-                        <Ionicons name="bar-chart-outline" size={props.size} color={props.color} />
+                        <FontAwesome6 name="money-bill-trend-up" size={props.size} color={props.color} />
                 }}
             />
             <Tabs.Screen
                 name="new"
                 options={{
-                    title: 'Tin tức',
+                    title: 'Ví',
                     tabBarIcon: (props) =>
-                        <AntDesign name="earth" size={props.size} color={props.color} />
+                        <FontAwesome6 name="wallet" size={props.size} color={props.color} />
                 }}
             />
             <Tabs.Screen
@@ -65,7 +60,7 @@ export default function AppTabLayout(){
                 options={{
                     title: 'Hồ sơ',
                     tabBarIcon: (props) =>
-                        <FontAwesome6 name="user-circle" size={props.size}  color={props.color} />,
+                        <FontAwesome6 name="user-large" size={props.size}  color={props.color} />,
                 }}
             />
         </Tabs>

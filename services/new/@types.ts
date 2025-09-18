@@ -16,8 +16,9 @@ export type NewContent = {
     type: _TypeNewContent,
 }
 export type NewListRequest = {
-    type: _TypeNewContent,
+    type?: _TypeNewContent,
     page?: number,
+    limit?:number,
 };
 export type NewListResponse = {
     data: NewContent[],

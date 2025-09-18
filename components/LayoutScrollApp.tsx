@@ -34,7 +34,7 @@ export default function LayoutScrollApp({children, title, style}: {
             <Animated.ScrollView
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
-                contentContainerStyle={{padding: 20, paddingTop: insets.top > 0 ? insets.top : 20}}
+                contentContainerStyle={{padding: 10, paddingTop: insets.top > 0 ? insets.top : 17}}
                 style={style as any}
             >
                 {title && <H6 paddingVertical={12} fontWeight={700}>{title}</H6>}

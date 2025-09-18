@@ -17,7 +17,10 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
           "NSExceptionDomains": {
-            "116.118.60.103": { "NSIncludesSubdomains": true, "NSTemporaryExceptionAllowsInsecureHTTPLoads": true }
+            "116.118.60.103": {
+              "NSIncludesSubdomains": true,
+              "NSTemporaryExceptionAllowsInsecureHTTPLoads": true
+            }
           }
         }
       }
@@ -27,7 +30,6 @@
         "foregroundImage": "./assets/images/zentrix_logo.png",
         "backgroundColor": "#ffffff"
       },
-      "usesCleartextTraffic": true,
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE"
@@ -61,7 +63,8 @@
         }
       ],
       "expo-font",
-      "expo-asset"
+      "expo-asset",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
