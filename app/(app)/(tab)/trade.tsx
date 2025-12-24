@@ -28,7 +28,6 @@ export default function TradeListScreen() {
     const {isRefetching, isLoading, data, refetch} = useQueryListAssetTrading(activeTab);
 
     const listData = data?.data || null;
-
     const listSymbol: string[] = useMemo(() => {
         if (listData) {
             return listData.reduce((acc,item) => {
@@ -67,7 +66,7 @@ export default function TradeListScreen() {
 
     return (
         <>
-            <LayoutScrollApp style={{marginBottom: insets.bottom + 40, marginTop: 10}}>
+            <LayoutScrollApp style={{marginBottom: insets.bottom, marginTop: 10}}>
                 <XStack alignItems={"center"} justifyContent={"center"}>
                     <BadgeAccount />
                 </XStack>

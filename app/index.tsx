@@ -1,7 +1,6 @@
 import {useEffect, useRef} from "react";
 import {Animated, View, Image, Text} from "react-native";
 import {useAuthStore} from "@/services/auth/store";
-import {checkLogin} from "@/services/auth/hook";
 import {APP_NAME} from "@/libs/constant_env";
 import {_AuthStatus} from "@/services/auth/@type";
 import {router} from "expo-router";

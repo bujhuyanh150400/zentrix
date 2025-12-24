@@ -42,7 +42,7 @@ export default function TradingScreen() {
 
     const [isWebViewReady, setIsWebViewReady] = useState(false);
     const {symbol} = useLocalSearchParams<{ symbol?: string }>();
-    const [openTransactionSheet, setOpenTransactionSheet] = useState<boolean>(false);
+    const [openTransactionSheet,  setOpenTransactionSheet] = useState<boolean>(false);
     const [tradeType, setTradeType] = useState<_TradeType>(_TradeType.BUY);
     const {account} =  useGetAccountActive();
     const [loadingChart, setLoadingChart] = useState(false);
@@ -61,7 +61,6 @@ export default function TradingScreen() {
     // get realtime
     useSubscribeSymbols([symbol || ''], authData?.user?.id, authData?.user?.secret);
     const priceRealtime = useSubscribeSymbolStore(s => s.prices[symbol || '']);
-
     const sendChartPayload = useCallback(() => {
         if (!webViewRef.current || !authData?.user || !symbol) return;
         const payload = {
