@@ -27,6 +27,10 @@ export enum _TradeType {
     BUY = 0,
     SELL = 1,
 }
+export enum _TypeTrading{
+    VOL = 0,
+    USD = 1,
+}
 export enum _TransactionTriggerType {
     TYPE_TRIGGER_NOW = 1,
     TYPE_TRIGGER_AUTO_TRIGGER = 2,
@@ -45,6 +49,7 @@ export type StoreTransactionRequestType = {
     trigger_price?: string;
     percent_take_profit?: string;
     percent_stop_loss?: string;
+    type_trading: _TypeTrading
 }
 
 export type TotalTransactionRequestType = {
@@ -81,6 +86,7 @@ export type Transaction = {
     "close_price_convert" : number | null,
     "fee": number,
     "fee_overnight": number,
+    "type_trading": _TypeTrading
     symbol: Symbol
 }
 

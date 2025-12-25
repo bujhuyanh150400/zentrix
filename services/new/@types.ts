@@ -13,6 +13,7 @@ export type NewContent = {
     image: string | null,
     slug:string,
     published_at: string,
+    author: string,
     type: _TypeNewContent,
 }
 export type NewListRequest = {

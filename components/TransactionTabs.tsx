@@ -3,13 +3,17 @@ import {Dispatch, FC, MutableRefObject, SetStateAction, useCallback, useEffect, 
 import useNestedState from "@/hooks/useNestedState";
 import {
     _TradeType,
-    _TransactionStatus, _TransactionTriggerType,
+    _TransactionStatus,
+    _TransactionTriggerType,
+    _TypeTrading,
     CalculateTransactionPrices,
     TransactionHistoryRequestType
 } from "@/services/transaction/@types";
 import {
-    useCalculateTransactionPrices, useMutationCanceledTrans,
-    useMutationCloseTrans, useMutationOpenNowTrans,
+    useCalculateTransactionPrices,
+    useMutationCanceledTrans,
+    useMutationCloseTrans,
+    useMutationOpenNowTrans,
     useTransactionHistory,
     useTransactionTotal
 } from "@/services/transaction/hook";
@@ -22,8 +26,8 @@ import HorizontalTabBar from "@/components/HorizontalTabBar";
 import SkeletonCardSymbol from "@/components/SkeletonCardSymbol";
 import SymbolAssetIcons from "@/components/SymbolAssetIcons";
 import SkeletonFade from "@/components/SkeletonFade";
-import { showMessage } from "react-native-flash-message";
-import { useShowErrorHandler } from "@/hooks/useHandleError";
+import {showMessage} from "react-native-flash-message";
+import {useShowErrorHandler} from "@/hooks/useHandleError";
 import {useGetAccountActive} from "@/services/account/hook";
 
 
@@ -51,6 +55,7 @@ const TransactionTabs: FC<Props> = (props) => {
 
     const transactionsData = transactions[filter.status] || [];
 
+    // console.log(transactionsData)
 
     const hookCalculate = useCalculateTransactionPrices(transactionsData, filter.status === _TransactionStatus.OPEN || filter.status === _TransactionStatus.WAITING);
 
@@ -182,11 +187,6 @@ const TransactionTabs: FC<Props> = (props) => {
                                             {hookCalculate.total.toFixed(2)}
                                         </Paragraph>
                                         <Separator vertical marginHorizontal={10}/>
-                                        <Paragraph fontWeight={700} color={DefaultColor.slate[400]}>Lãi/Lỗ sau tính:</Paragraph>
-                                        <Paragraph fontWeight={700}
-                                                   color={hookCalculate.total_real > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>
-                                            {hookCalculate.total_real.toFixed(2)}
-                                        </Paragraph>
                                     </XStack>
                                 )}
 
@@ -261,7 +261,7 @@ const SymbolAndInfo: FC<{item: CalculateTransactionPrices}> = ({item}) => (
                 <XStack gap={"$1"} alignItems={"center"}>
                     <Paragraph fontSize={14} fontWeight={500}
                                color={item.type === _TradeType.BUY ? DefaultColor.blue[500] : DefaultColor.red[500]}>
-                        {item.type === _TradeType.BUY ? 'Mua' : 'Bán'} {item.volume.toFixed(2)} lô
+                        {item.type === _TradeType.BUY ? 'Mua' : 'Bán'} {item.volume.toFixed(2)} {item.type_trading === _TypeTrading.USD ? "USD" : "Lô"}
                     </Paragraph>
                     {item.entry_price &&
                         <Paragraph fontSize={14} fontWeight={500}
@@ -278,7 +278,7 @@ const SymbolAndInfo: FC<{item: CalculateTransactionPrices}> = ({item}) => (
                     {item.profit ? (
                         <Paragraph fontSize={14} fontWeight={500}
                                    color={item.profit > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>
-                            {item.profit.toFixed(2)}
+                            Lãi/ Lỗ: {item.profit.toFixed(2)}
                         </Paragraph>
                     ) : <SkeletonFade/>}
                     {item.realtime_price ? (
@@ -347,7 +347,6 @@ const TransactionInfoSheet: FC<{
             });
         },
         onError: (error) => {
-            console.log(error)
             // eslint-disable-next-line react-hooks/rules-of-hooks
             useShowErrorHandler({error});
         }
@@ -447,7 +446,9 @@ const TransactionInfoSheet: FC<{
             onOpenChange={(open: boolean) => {
                 onClosed(open);
             }}
-            snapPoints={[90]}
+            snapPoints={[70]}
+            forceRemoveScrollEnabled={true}
+            animation="medium"
             dismissOnSnapToBottom
             zIndex={100_000}
         >
@@ -458,132 +459,122 @@ const TransactionInfoSheet: FC<{
                 exitStyle={{opacity: 0}}
             />
             <Sheet.Handle/>
-            <Sheet.Frame padding="$4" gap="$2">
+            <Sheet.Frame padding="$4" gap="$2" justifyContent={"space-between"}>
                 {data && (
-                    <YStack gap={"$2"}>
-                        <XStack alignItems={"center"} justifyContent={"center"}>
-                            <Paragraph fontWeight={500} fontSize={12} color={DefaultColor.slate[500]} alignItems={"center"}>#{data.code}</Paragraph>
-                        </XStack>
-                        {/*symbol info*/}
-                        <SymbolAndInfo item={data} />
-                        {data.status === _TransactionStatus.WAITING && (
-                            <>
-                                <XStack alignItems={"center"} justifyContent={"space-between"}>
-                                    <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Mở giao dịch lúc:</Paragraph>
-                                    <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                        {data.type_trigger === _TransactionTriggerType.TYPE_TRIGGER_LOW_BUY && 'Giá thấp'}
-                                        {data.type_trigger === _TransactionTriggerType.TYPE_TRIGGER_HIGH_BUY && 'Giá cao'}
+                    <>
+                        <YStack gap={"$2"}>
+                            <XStack alignItems={"center"} justifyContent={"center"}>
+                                <Paragraph fontWeight={500} fontSize={12} color={DefaultColor.slate[500]} alignItems={"center"}>#{data.code}</Paragraph>
+                            </XStack>
+                            {/*symbol info*/}
+                            {data.status === _TransactionStatus.WAITING && (
+                                <>
+                                    <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                        <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Mở giao dịch lúc:</Paragraph>
+                                        <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                            {data.type_trigger === _TransactionTriggerType.TYPE_TRIGGER_LOW_BUY && 'Giá thấp'}
+                                            {data.type_trigger === _TransactionTriggerType.TYPE_TRIGGER_HIGH_BUY && 'Giá cao'}
+                                        </Paragraph>
+                                    </XStack>
+
+                                </>
+                            )}
+                            {/*Trạng thái*/}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Trạng thái:</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.status === _TransactionStatus.OPEN && 'Mở'}
+                                    {data.status === _TransactionStatus.WAITING && 'Chờ giao dịch'}
+                                    {data.status === _TransactionStatus.CLOSED && 'Đóng'}
+                                </Paragraph>
+                            </XStack>
+                            {/*Giá mở*/}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Giá mở:</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.entry_price ? data.entry_price.toFixed(2) : '__'}
+                                </Paragraph>
+                            </XStack>
+                            {/*Giá đóng*/}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Giá đóng:</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.close_price ? data.close_price.toFixed(2) : '__'}
+                                </Paragraph>
+                            </XStack>
+                            {/*Lỗ/Lãi:*/}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Lỗ/Lãi:</Paragraph>
+                                {data.profit ? (
+                                    <Paragraph fontWeight={500}
+                                               color={data.profit > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>
+                                        {data.profit.toFixed(2)}
                                     </Paragraph>
-                                </XStack>
-
-                            </>
-                        )}
-                        {/*Trạng thái*/}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Trạng thái:</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.status === _TransactionStatus.OPEN && 'Mở'}
-                                {data.status === _TransactionStatus.WAITING && 'Chờ giao dịch'}
-                                {data.status === _TransactionStatus.CLOSED && 'Đóng'}
-                            </Paragraph>
-                        </XStack>
-                        {/*Giá mở*/}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Giá mở:</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.entry_price ? data.entry_price.toFixed(2) : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/*Giá đóng*/}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Giá đóng:</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.close_price ? data.close_price.toFixed(2) : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/*Lỗ/Lãi:*/}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Lỗ/Lãi:</Paragraph>
-                            {data.profit ? (
-                                <Paragraph fontWeight={500}
-                                           color={data.profit > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>
-                                    {data.profit.toFixed(2)}
+                                ) : <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>__</Paragraph>}
+                            </XStack>
+                            {/*Thời gian mở*/}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Thời gian mở:</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.open_at ? new Date(data.open_at).toLocaleString() : '__'}
                                 </Paragraph>
-                            ) : <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>__</Paragraph>}
-                        </XStack>
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Lỗ/Lãi sau tính:</Paragraph>
-                            {data.real_time_profit ? (
-                                <Paragraph fontWeight={500}
-                                           color={data.real_time_profit > 0 ? DefaultColor.green[500] : DefaultColor.red[500]}>
-                                    {data.real_time_profit.toFixed(2)}
+                            </XStack>
+                            {/*Thời gian đóng*/}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Thời gian đóng:</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.close_at ? new Date(data.close_at).toLocaleString() : '__'}
                                 </Paragraph>
-                            ) : <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>__</Paragraph>}
-                        </XStack>
-                        {/*Thời gian mở*/}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Thời gian mở:</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.open_at ? new Date(data.open_at).toLocaleString() : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/*Thời gian đóng*/}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Thời gian đóng:</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.close_at ? new Date(data.close_at).toLocaleString() : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/*Giá chốt */}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Giá chốt giao dịch:</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.trigger_price ? data.trigger_price.toFixed(2) : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/*Cắt Lỗ*/}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Cắt lỗ (SL)</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.stop_loss ? data.stop_loss.toFixed(2) : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/*Chốt lời*/}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Chốt lời (TP)</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.take_profit ? data.take_profit.toFixed(2) : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/* Phí */}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Phí</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.fee ? data.fee.toFixed(2) : '__'}
-                            </Paragraph>
-                        </XStack>
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Phí qua đêm</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.fee_overnight ? data.fee_overnight.toFixed(2) : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/* Đòn bẩy */}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Đòn bẩy</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.level ? `1:${data.level}` : '__'}
-                            </Paragraph>
-                        </XStack>
-                        {/* Tỉ giá chuyển đổi USD */}
-                        <XStack alignItems={"center"} justifyContent={"space-between"}>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Tỉ giá chuyển đổi USD</Paragraph>
-                            <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
-                                {data.rate_to_usd ? `${data.rate_to_usd.toFixed(2)} USD` : '__'}
-                            </Paragraph>
-                        </XStack>
-
-
+                            </XStack>
+                            {/*Giá chốt */}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Giá chốt giao dịch:</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.trigger_price ? data.trigger_price.toFixed(2) : '__'}
+                                </Paragraph>
+                            </XStack>
+                            {/*Cắt Lỗ*/}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Cắt lỗ (SL)</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.stop_loss ? data.stop_loss.toFixed(2) : '__'}
+                                </Paragraph>
+                            </XStack>
+                            {/*Chốt lời*/}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Chốt lời (TP)</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.take_profit ? data.take_profit.toFixed(2) : '__'}
+                                </Paragraph>
+                            </XStack>
+                            {/* Phí */}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Phí</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.fee ? data.fee.toFixed(2) : '__'}
+                                </Paragraph>
+                            </XStack>
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Phí qua đêm</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.fee_overnight ? data.fee_overnight.toFixed(2) : '__'}
+                                </Paragraph>
+                            </XStack>
+                            {/* Đòn bẩy */}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Đòn bẩy</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.level ? `1:${data.level}` : '__'}
+                                </Paragraph>
+                            </XStack>
+                            {/* Tỉ giá chuyển đổi USD */}
+                            <XStack alignItems={"center"} justifyContent={"space-between"}>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[500]}>Tỉ giá chuyển đổi USD</Paragraph>
+                                <Paragraph fontWeight={500} color={DefaultColor.slate[700]}>
+                                    {data.rate_to_usd ? `${data.rate_to_usd.toFixed(2)} USD` : '__'}
+                                </Paragraph>
+                            </XStack>
+                        </YStack>
                         {data.status === _TransactionStatus.OPEN && (
                             <Button
                                 disabled={mutationCloseTrans.isPending}
@@ -620,7 +611,7 @@ const TransactionInfoSheet: FC<{
                                 </Button>
                             </XStack>
                         }
-                    </YStack>
+                    </>
                 )}
             </Sheet.Frame>
         </Sheet>

@@ -10,6 +10,7 @@ import {Button, H6, Input, Label, Spinner, XStack, YStack,Form} from "tamagui";
 import {Controller} from "react-hook-form";
 import {AntDesign} from "@expo/vector-icons";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import DefaultColor from "@/components/ui/DefaultColor";
 
 
 export default function RegisterScreen() {
@@ -213,6 +214,8 @@ export default function RegisterScreen() {
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={isSubmitting}
                                 theme="yellow"
+                                color={DefaultColor.white}
+                                backgroundColor={DefaultColor.primary_color}
                                 size="$4"
                                 marginTop="$4"
                                 icon={isSubmitting || isPending ? <Spinner/> : undefined}

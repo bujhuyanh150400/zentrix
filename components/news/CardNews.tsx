@@ -4,7 +4,7 @@ import {Image, StyleSheet, TouchableOpacity} from "react-native";
 import {sizeDefault} from "@/components/ui/DefaultStyle";
 import DefaultColor from "@/components/ui/DefaultColor";
 import {router} from "expo-router";
-import {Paragraph, YStack} from "tamagui";
+import {Paragraph, XStack, YStack} from "tamagui";
 import {removeHTMLTags} from "@/libs/utils";
 import SkeletonFade from "@/components/SkeletonFade";
 
@@ -26,11 +26,15 @@ const CardNews: FC<Props> = ({item}) => {
             <YStack gap={"$2"} style={styles.textContainer}>
                 {item ?
                     <>
-                        <Paragraph style={styles.title} numberOfLines={1}>{item.title}</Paragraph>
+                        <Paragraph style={styles.title} numberOfLines={2}>{item.title}</Paragraph>
                         <Paragraph style={styles.summary}
                                    numberOfLines={1}>{removeHTMLTags(item.summary).slice(0, 50)}</Paragraph>
-                        <Paragraph style={styles.date}
-                                   numberOfLines={1}>{new Date(item.published_at).toLocaleDateString()}</Paragraph>
+                       <XStack alignItems={"center"} justifyContent={"space-between"}>
+                           <Paragraph style={styles.date} numberOfLines={1}>{item.author}</Paragraph>
+                           <Paragraph style={styles.date}
+                                      numberOfLines={1}>{new Date(item.published_at).toLocaleDateString()}</Paragraph>
+
+                       </XStack>
                     </>
 
                     :

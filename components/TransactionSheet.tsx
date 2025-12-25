@@ -4,6 +4,7 @@ import {
     _TradeType,
     _TransactionStatus,
     _TransactionTriggerType,
+    _TypeTrading,
     StoreTransactionRequestType
 } from "@/services/transaction/@types";
 import {Account} from "@/services/account/@types";
@@ -19,11 +20,11 @@ import {showMessage} from "react-native-flash-message";
 import {useShowErrorHandler} from "@/hooks/useHandleError";
 import {calculateProfit, formatNumber, parseToNumber} from "@/libs/utils";
 import {Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View} from "react-native";
-import {Button, Paragraph,  XStack, YStack} from "tamagui";
+import {Button, Paragraph, XStack, YStack} from "tamagui";
 import {MaterialIcons} from '@expo/vector-icons';
 import DefaultColor from "@/components/ui/DefaultColor";
 import HorizontalTabBar from "@/components/HorizontalTabBar";
-import BottomSheet, {BottomSheetBackdrop, BottomSheetView, BottomSheetScrollView} from '@gorhom/bottom-sheet';
+import BottomSheet, {BottomSheetBackdrop, BottomSheetScrollView, BottomSheetView} from '@gorhom/bottom-sheet';
 import TransactionMoreInfo from "@/components/TransactionMoreInfo";
 import {sizeDefault} from "@/components/ui/DefaultStyle";
 import {useGetAccountActive} from "@/services/account/hook";
@@ -65,12 +66,14 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
         trigger_price: "",
         percent_take_profit: "",
         percent_stop_loss: "",
+        type_trading: _TypeTrading.VOL
     });
 
     const hookInfoTrading = useCalculateInfoTrading(
         props.price,
         parseToNumber(form.volume),
         props.account,
+        form.type_trading,
         props.symbol
     );
 
@@ -110,11 +113,13 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
 
     useEffect(() => {
         if (parseToNumber(form.volume) < 0) {
-            setError({volume: "Khối lượng không được nhỏ hơn 0.01", isError: true});
+            setError({volume: "Khối lượng không được nhỏ hơn 0", isError: true});
         } else {
             setError({volume: "", isError: false});
         }
-        if ([_TransactionTriggerType.TYPE_TRIGGER_LOW_BUY, _TransactionTriggerType.TYPE_TRIGGER_HIGH_BUY, _TransactionTriggerType.TYPE_TRIGGER_AUTO_TRIGGER].includes(form.type_trigger)) {
+        if ([_TransactionTriggerType.TYPE_TRIGGER_LOW_BUY, 
+            _TransactionTriggerType.TYPE_TRIGGER_HIGH_BUY, 
+            _TransactionTriggerType.TYPE_TRIGGER_AUTO_TRIGGER].includes(form.type_trigger)) {
             if (form.percent_stop_loss) {
                 const stopLoss = parseToNumber(form.percent_stop_loss);
                 if (stopLoss < 0 || stopLoss > 100) {
@@ -172,6 +177,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                 trigger_price: "",
                 percent_take_profit: "",
                 percent_stop_loss: "",
+                type_trading: _TypeTrading.VOL
             })
         }
     }, [props.symbol, props.account, props.open]);
@@ -221,7 +227,6 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
             setOpenMoreInfo(false);
         }
     }, [props.open]);
-
     return (
         <>
             <BottomSheet
@@ -257,20 +262,36 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                             <YStack padding="$4" gap="$2">
                                 <XStack alignItems={"center"} justifyContent={"space-between"}>
                                     <Paragraph fontSize={16} fontWeight={700}>Giao dịch</Paragraph>
-                                    <TouchableOpacity
-                                        style={[
-                                            styles.btn_round, {
-                                                backgroundColor: openMore ? DefaultColor.slate[300] : DefaultColor.slate[400],
-                                            }
-                                        ]}
-                                        onPress={() => {
-                                            setOpenMore(!openMore);
-                                        }}
-                                    >
-                                        <MaterialIcons name="candlestick-chart" size={24} color={
-                                            openMore ? "white" : "black"
-                                        }/>
-                                    </TouchableOpacity>
+                                    <XStack gap={"$2"}>
+                                        <TouchableOpacity
+                                            style={[
+                                                styles.btn_round, {
+                                                    backgroundColor: form.type_trading === _TypeTrading.USD ? DefaultColor.green[500] : DefaultColor.green[200],
+                                                }
+                                            ]}
+                                            onPress={() => {
+                                                setForm({
+                                                    type_trading: form.type_trading === _TypeTrading.USD ? _TypeTrading.VOL : _TypeTrading.USD
+                                                });
+                                            }}
+                                        >
+                                            <MaterialIcons name="attach-money" size={24} color={"black"}/>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={[
+                                                styles.btn_round, {
+                                                    backgroundColor: openMore ? DefaultColor.slate[300] : DefaultColor.slate[400],
+                                                }
+                                            ]}
+                                            onPress={() => {
+                                                setOpenMore(!openMore);
+                                            }}
+                                        >
+                                            <MaterialIcons name="candlestick-chart" size={24} color={
+                                                openMore ? "white" : "black"
+                                            }/>
+                                        </TouchableOpacity>
+                                    </XStack>
                                 </XStack>
                                 <View>
                                     {!openMore ? (
@@ -286,7 +307,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                                                     setForm({volume: formatNumber(num)})
                                                     setSnapPoint(SNAP_CLOSE);
                                                 }}
-                                                pre={"Lô"}
+                                                pre={form.type_trading === _TypeTrading.USD ? "USD" : "Lô"}
                                             />
                                             {error?.volume && (
                                                 <Paragraph color="red">{error.trigger_price}</Paragraph>
@@ -350,7 +371,7 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                                                             value={form.volume}
                                                             reference={0.01}
                                                             onChange={(value) => setForm({volume: value})}
-                                                            pre={"Lô"}
+                                                            pre={form.type_trading === _TypeTrading.USD ? "USD" : "Lô"}
                                                         />
                                                         {error?.volume && (
                                                             <Paragraph color="red">{error.volume}</Paragraph>
@@ -365,7 +386,6 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                                                                 value={form.trigger_price || ""}
                                                                 reference={0.1}
                                                                 onChange={(value) => setForm({trigger_price: value})}
-                                                                pre={"Lô"}
                                                             />
                                                             {error?.trigger_price && (
                                                                 <Paragraph color="red">{error.trigger_price}</Paragraph>
@@ -435,20 +455,24 @@ const TransactionSheet: FC<TransactionSheetProps> = (props) => {
                                                     trigger_price: form.trigger_price,
                                                     percent_take_profit: form.percent_take_profit,
                                                     percent_stop_loss: form.percent_stop_loss,
+                                                    type_trading: form.type_trading,
                                                 }
                                                 mutate(dataSubmit)
                                             }}
                                         >
                                             <YStack alignItems="center" justifyContent="center">
                                                 <Paragraph theme="alt2" fontSize="$2" color="#fff">Xác
-                                                    nhận {props.tradeType === _TradeType.BUY ? "Mua" : "Bán"} {form.volume} lô</Paragraph>
+                                                    nhận {props.tradeType === _TradeType.BUY ? "Mua" : "Bán"}
+                                                    {
+                                                        form.type_trading === _TypeTrading.USD ? ` ${form.volume} USD` : ` ${form.volume} Lô`
+                                                    }
+                                                </Paragraph>
                                                 <Paragraph theme="alt2" fontSize="$5" fontWeight="500" color="#fff">
                                                     {props.price}
                                                 </Paragraph>
                                             </YStack>
                                         </Button>
                                     </XStack>
-
                                     <XStack justifyContent={"space-between"} alignItems={"center"} gap={"$2"}>
                                         <Paragraph color={DefaultColor.slate[400]} fontSize={sizeDefault.sm}>
                                             Phí: ~{hookInfoTrading.trans_fee.toFixed(2)} | Thực: ~{hookInfoTrading.priceConvert.totalPrice.toFixed(2)} (Đòn bẩy: {props.account?.lever?.min || 0}:{props.account?.lever?.max || 0})

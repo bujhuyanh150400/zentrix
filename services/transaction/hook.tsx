@@ -1,5 +1,6 @@
 import {
     _TransactionStatus,
+    _TypeTrading,
     CalculateTransactionPrices,
     StoreTransactionRequestType,
     Transaction,
@@ -20,6 +21,7 @@ import {_ConfigKey} from "@/services/common/@types";
 import {Account} from "@/services/account/@types";
 import {Symbol} from "@/services/assest_trading/@types";
 import {parseToNumber} from "@/libs/utils";
+import {calculateCloseTransaction, calculateConvertPrice} from "@/services/transaction/helper";
 
 
 export const useTransactionHistory = (params: TransactionHistoryRequestType) => {
@@ -86,25 +88,17 @@ export const useCalculateTransactionPrices = (transaction: Transaction[], enable
         return transaction.reduce((acc, item) => {
             const symbolPrice = prices[item.symbol.symbol];
             if (symbolPrice && (item.status === _TransactionStatus.OPEN || item.status === _TransactionStatus.WAITING)) {
-                const entryVolumePrice = item.entry_price * item.volume;
-                const realtimeVolumePrice = symbolPrice.price * item.volume;
+                const entryPrice = calculateConvertPrice(item, symbolPrice.price);
                 if (item.status === _TransactionStatus.OPEN){
-                    const profit = (realtimeVolumePrice - entryVolumePrice);
-                    const profitRateToUSD = (realtimeVolumePrice - entryVolumePrice) * item.rate_to_usd;
-                    const percentProfitLoss = (profitRateToUSD) / 100;
-                    const level = item.level ? item.level : 10000;
+                    const calculate = calculateCloseTransaction(item, symbolPrice.price);
 
-                    const realTimeProfit = (entryVolumePrice * level * percentProfitLoss);
-
-                    acc.total += profit;
-                    acc.total_real += realTimeProfit;
+                    acc.total += calculate.total;
                     acc.data.push({
                         ...item,
-                        profit: profit,
-                        real_time_profit: realTimeProfit,
+                        profit: calculate.total,
                         realtime_price: symbolPrice.price,
-                        entry_volume_price: entryVolumePrice,
-                        realtime_volume_price: realtimeVolumePrice,
+                        entry_volume_price: entryPrice,
+                        realtime_volume_price: calculate.close_price_convert,
                     });
                 }
                 if (item.status === _TransactionStatus.WAITING) {
@@ -114,30 +108,19 @@ export const useCalculateTransactionPrices = (transaction: Transaction[], enable
                     });
                 }
             }else if (item.status === _TransactionStatus.CLOSED && item.close_price) {
-                const entryVolumePrice = item.entry_price * item.volume;
-                const closedVolumePrice = item.close_price * item.volume;
-                const profit = (closedVolumePrice - entryVolumePrice);
-                const profitRateToUSD = (closedVolumePrice - entryVolumePrice) * item.rate_to_usd;
-                const percentProfitLoss = (profitRateToUSD) / 100;
-                const level = item.level ? item.level : 10000;
-
-                const realTimeProfit = (entryVolumePrice * level * percentProfitLoss);
-
+                const calculate = calculateCloseTransaction(item, item.close_price);
                 acc.data.push({
                     ...item,
-                    profit: profit,
-                    real_time_profit: realTimeProfit,
+                    profit: calculate.total,
+                    realtime_volume_price: calculate.close_price_convert,
                 });
             }
             return acc;
         }, {
             total: 0,
-            total_real: 0,
             data: [] as CalculateTransactionPrices[]
         })
     },[prices, transaction])
-
-
 }
 
 export const useMutationCloseTrans = ({onSuccess,onError}: {
@@ -176,7 +159,13 @@ export const useMutationStoreTrans = ({onSuccess,onError}: {
     onError,
 })
 
-export const useCalculateInfoTrading = (realTimePrice: number, volume: number, account: Account | null, symbol?: Symbol) => {
+export const useCalculateInfoTrading = (
+    realTimePrice: number,
+    volume: number,
+    account: Account | null,
+    type_trading: _TypeTrading,
+    symbol?: Symbol,
+) => {
     const {config, getConfig} = useConfigApp(); 
 
     // phí
@@ -188,19 +177,6 @@ export const useCalculateInfoTrading = (realTimePrice: number, volume: number, a
             trans_fee_overnight: trans_fee_overnight / 100
         }
     },[config]);
-
-    // Ký quỹ = (Volume × Giá) / Đòn bẩy
-    const deposit = useMemo(() => {
-        const level = account?.lever;
-        if (level){
-            let leverMax = 1;
-            if (level.max !== null) {
-                leverMax = parseToNumber(level.max);
-                return (realTimePrice * volume)/ leverMax;
-            }
-        }
-        return 0;
-    },[account?.lever, realTimePrice, volume]);
 
     // Giá chuyển đổi sang USD
     const quoteCurrency = useMemo(() => {
@@ -217,21 +193,42 @@ export const useCalculateInfoTrading = (realTimePrice: number, volume: number, a
 
     const rateToUsd = useGetPriceConvertUsd(quoteCurrency || '');
 
-    const priceConvert = useMemo(() => {
-        const priceVolume = realTimePrice * volume;
-        const fee = configFee.trans_fee * priceVolume;
+    // Ký quỹ = (Volume × Giá) / Đòn bẩy
+    const deposit = useMemo(() => {
+        const level = account?.lever;
+        if (level){
+            let leverMax = 1;
+            if (level.max !== null) {
+                leverMax = parseToNumber(level.max);
+                if (type_trading === _TypeTrading.VOL){
+                    return (realTimePrice * volume)/ leverMax;
+                }else{
+                    return (realTimePrice * rateToUsd)/ leverMax
+                }
+            }
+        }
+        return 0;
+    },[account?.lever, realTimePrice, volume, type_trading, rateToUsd]);
 
+    const priceConvert = useMemo(() => {
+        let priceVolume = realTimePrice;
+        if (type_trading === _TypeTrading.VOL){
+            priceVolume = priceVolume * volume;
+        }else{
+            priceVolume = priceVolume * rateToUsd;
+        }
+        const fee = configFee.trans_fee * priceVolume;
         // giá tổng là giá + thêm phí giao dịch, phí qua đêm sẽ trừ trên server
         const totalPrice = priceVolume + fee;
 
         // gía convert sang usd
-        const convertPrice = totalPrice * rateToUsd;
+        const convertPrice = type_trading === _TypeTrading.VOL ? totalPrice * rateToUsd : totalPrice;
 
         return {
             totalPrice,
             convertPrice
         }
-    }, [rateToUsd, realTimePrice, volume, configFee]);
+    }, [rateToUsd, realTimePrice, volume, configFee, type_trading]);
 
 
     return {

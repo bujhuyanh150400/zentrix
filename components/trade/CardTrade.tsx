@@ -69,6 +69,7 @@ const CardTrade: FC<Props> = (props) => {
         return [] as { time: number, value: number }[];
     }, [data])
 
+
     return (
         <TouchableOpacity
             onPress={() => {
@@ -97,7 +98,7 @@ const CardTrade: FC<Props> = (props) => {
                     </>}
                 </YStack>
                 <YStack gap="$1" alignItems={"flex-end"}>
-                    {symbolRealPrice ? (
+                    {symbolRealPrice && symbolRealPrice.percent && chartData.length > 0 ? (
                         <>
                             {symbolRealPrice.percent ?
                                 <Paragraph fontSize={sizeDefault.sm}

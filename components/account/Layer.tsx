@@ -20,7 +20,6 @@ type Props = {
 
 export const AccountCard: FC<Props> = ({account, loading}) => {
     const [openSheet, setOpenSheet] = useState<boolean>(false);
-    console.log(account)
     const userProfileQuery = useQueryGetUserProfile();
 
     const userProfile = userProfileQuery?.data || null;

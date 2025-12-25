@@ -41,7 +41,7 @@ export default function OnboardScreen() {
             <View style={styles.buttons}>
                 <TouchableOpacity
                     style={[styles.button,{
-                        backgroundColor: DefaultColor.slate[600]
+                        backgroundColor: DefaultColor.primary_color
                     }]}
                     onPress={() => {
                         router.push('/(auth)/login')
