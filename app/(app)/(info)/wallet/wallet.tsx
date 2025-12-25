@@ -1,198 +1,254 @@
-import {FontAwesome6} from "@expo/vector-icons";
-import {ActivityIndicator, Alert, FlatList, TouchableOpacity, View} from "react-native";
-import {Button, H4, Paragraph, Separator, XStack, YStack,} from "tamagui";
-import dayjs from "dayjs";
-import React, {useState} from "react";
 import DefaultColor from "@/components/ui/DefaultColor";
-import {useQueryGetUserProfile} from "@/services/auth/hook";
-import {sizeDefault} from "@/components/ui/DefaultStyle";
-import {router} from "expo-router";
-import {_VerifyUserStatus} from "@/services/auth/@type";
-import {useInfiniteWalletList} from "@/services/wallet/hook";
+import { sizeDefault } from "@/components/ui/DefaultStyle";
 import useNestedState from "@/hooks/useNestedState";
-import {_WalletTransactionStatus, ListWalletRequest, WalletTransaction} from "@/services/wallet/@types";
-import {RefreshControl} from "react-native-gesture-handler";
+import { _VerifyUserStatus } from "@/services/auth/@type";
+import { useQueryGetUserProfile } from "@/services/auth/hook";
+import {
+  _WalletTransactionStatus,
+  ListWalletRequest,
+  WalletTransaction,
+} from "@/services/wallet/@types";
+import { useInfiniteWalletList } from "@/services/wallet/hook";
+import { FontAwesome6 } from "@expo/vector-icons";
+import dayjs from "dayjs";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { RefreshControl } from "react-native-gesture-handler";
+import { Button, H4, Paragraph, Separator, XStack, YStack } from "tamagui";
 
 const getTransactionColor = (status: _WalletTransactionStatus) => {
-    if (status === _WalletTransactionStatus.APPROVED_STATUS) return DefaultColor.green[500]; // Green for success
-    if (status === _WalletTransactionStatus.REJECTED_STATUS) return DefaultColor.red[500]; // Red for failed
-    if (status === _WalletTransactionStatus.PENDING_STATUS) return DefaultColor.yellow[500]; // Orange for pending
-    return "gray"; // Default gray
+  if (status === _WalletTransactionStatus.APPROVED_STATUS)
+    return DefaultColor.green[500]; // Green for success
+  if (status === _WalletTransactionStatus.REJECTED_STATUS)
+    return DefaultColor.red[500]; // Red for failed
+  if (status === _WalletTransactionStatus.PENDING_STATUS)
+    return DefaultColor.yellow[500]; // Orange for pending
+  return "gray"; // Default gray
 };
-const getStatusText = (status:  _WalletTransactionStatus) => {
-    switch (status) {
-        case _WalletTransactionStatus.APPROVED_STATUS:
-            return "Thành công";
-        case _WalletTransactionStatus.PENDING_STATUS:
-            return "Đang xử lý";
-        case _WalletTransactionStatus.REJECTED_STATUS:
-            return "Thất bại";
-        default:
-            return status;
-    }
+const getStatusText = (status: _WalletTransactionStatus) => {
+  switch (status) {
+    case _WalletTransactionStatus.APPROVED_STATUS:
+      return "Thành công";
+    case _WalletTransactionStatus.PENDING_STATUS:
+      return "Đang xử lý";
+    case _WalletTransactionStatus.REJECTED_STATUS:
+      return "Thất bại";
+    default:
+      return status;
+  }
 };
 const formatAmount = (amount: number) => {
-    const formattedAmount = new Intl.NumberFormat("vi-VN").format(amount);
-    return `-${formattedAmount} VND`;
+  const formattedAmount = new Intl.NumberFormat("vi-VN").format(amount);
+  return `-${formattedAmount} VND`;
 };
 export default function WalletScreen() {
-    const [sheetOpen, setSheetOpen] = useState(false);
-    const [selectedTransaction, setSelectedTransaction] = useState<WalletTransaction | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<WalletTransaction | null>(null);
 
-    const handleTransactionPress = (item: WalletTransaction) => {
-        setSelectedTransaction(item);
-        setSheetOpen(true);
-    };
+  const handleTransactionPress = (item: WalletTransaction) => {
+    setSelectedTransaction(item);
+    setSheetOpen(true);
+  };
 
-    const userProfileQuery = useQueryGetUserProfile();
+  const userProfileQuery = useQueryGetUserProfile();
 
-    const [filter,setFilter] = useNestedState<ListWalletRequest>({
-        page: 1
-    })
+  const [filter, setFilter] = useNestedState<ListWalletRequest>({
+    page: 1,
+  });
 
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-        refetch,
-        isRefetching,
-    }= useInfiniteWalletList(filter)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    isRefetching,
+  } = useInfiniteWalletList(filter);
 
-    const userProfile = userProfileQuery?.data || null;
+  const userProfile = userProfileQuery?.data || null;
 
-    const flatData = data?.pages.flatMap((page) => page.data) || [];
+  const flatData = data?.pages.flatMap((page) => page.data) || [];
 
+  return (
+    <YStack gap={16} padding={16} flex={1}>
+      {/* Header Section */}
+      <XStack alignItems="center" justifyContent="space-between">
+        <H4 fontWeight="bold">Ví tiền</H4>
+      </XStack>
+      {/* Balance Card */}
+      <YStack marginTop={16}>
+        <Paragraph
+          color={DefaultColor.slate["500"]}
+          fontSize={sizeDefault.base}
+          marginBottom={8}
+        >
+          Tổng số dư
+        </Paragraph>
+        <Paragraph
+          fontSize={sizeDefault.xl}
+          fontWeight="bold"
+          marginBottom={16}
+        >
+          {userProfile?.money
+            ? Number(userProfile.money).toLocaleString("en-US")
+            : 0}{" "}
+          VND
+        </Paragraph>
+        <Button
+          theme="yellow"
+          size="$4"
+          borderRadius={8}
+          onPress={() => {
+            if (userProfile?.status === _VerifyUserStatus.ACTIVE) {
+              router.push("/(app)/(info)/wallet/withdraw");
+            } else {
+              Alert.alert(
+                "Tài khoản cần xác thực",
+                "Bạn cần xác thực tài khoản để rút tiền"
+              );
+            }
+          }}
+        >
+          <FontAwesome6 name="money-bill-wave" size={16} />
+          <Paragraph fontSize={14} fontWeight="bold">
+            Rút tiền
+          </Paragraph>
+        </Button>
+      </YStack>
 
-    return (
-        <YStack gap={16} padding={16} flex={1}>
-            {/* Header Section */}
-            <XStack alignItems="center" justifyContent="space-between">
-                <H4 fontWeight="bold">Ví tiền</H4>
-            </XStack>
-            {/* Balance Card */}
-            <YStack marginTop={16}>
-                <Paragraph color={DefaultColor.slate['500']} fontSize={sizeDefault.base} marginBottom={8}>
-                    Tổng số dư
-                </Paragraph>
-                <Paragraph fontSize={sizeDefault.xl} fontWeight="bold" marginBottom={16}>
-                    {userProfile?.money ? Number(userProfile.money).toLocaleString('en-US') : 0} VND
-                </Paragraph>
-                <Button theme="yellow" size="$4" borderRadius={8} onPress={() => {
-                    if (userProfile?.status === _VerifyUserStatus.ACTIVE) {
-                        router.push("/(app)/(info)/wallet/withdraw");
-                    }else {
-                        Alert.alert('Tài khoản cần xác thực', 'Bạn cần xác thực tài khoản để rút tiền')
-                    }
-                }}>
-                    <FontAwesome6 name="money-bill-wave" size={16}/>
-                    <Paragraph fontSize={14} fontWeight="bold">
-                        Rút tiền
+      <Separator marginVertical={8} />
+
+      {/* Transaction History */}
+      <YStack flex={1}>
+        <XStack
+          justifyContent="space-between"
+          alignItems="center"
+          marginBottom={12}
+        >
+          <Paragraph fontWeight="bold" fontSize={18}>
+            Lịch sử giao dịch
+          </Paragraph>
+        </XStack>
+        <FlatList
+          style={{
+            flex: 1,
+          }}
+          data={flatData}
+          keyExtractor={(item) => item.id.toString()}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={() => {
+            if (!isFetchingNextPage) return null;
+            return <ActivityIndicator style={{ marginVertical: 10 }} />;
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={() => refetch()}
+            />
+          }
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              key={item.id}
+              onPress={() => handleTransactionPress(item)}
+              style={{ marginBottom: 12 }}
+            >
+              <XStack
+                alignItems="center"
+                backgroundColor="white"
+                borderRadius={12}
+                padding={16}
+                borderWidth={1}
+                borderColor={DefaultColor.slate[500]}
+              >
+                {/* Content */}
+                <YStack flex={1} gap={4}>
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <Paragraph fontWeight="700" fontSize={16}>
+                      Rút tiền
                     </Paragraph>
-                </Button>
-            </YStack>
-
-            <Separator marginVertical={8}/>
-
-            {/* Transaction History */}
-            <YStack flex={1}>
-                <XStack justifyContent="space-between" alignItems="center" marginBottom={12}>
-                    <Paragraph fontWeight="bold" fontSize={18}>
-                        Lịch sử giao dịch
+                    <Paragraph
+                      fontWeight="700"
+                      fontSize={16}
+                      color={getTransactionColor(item.status)}
+                    >
+                      {item.money.toLocaleString("en-US")} VND
                     </Paragraph>
-                </XStack>
-                <FlatList
-                    style={{
-                        flex: 1
-                    }}
-                    data={flatData}
-                    keyExtractor={(item) => item.id.toString()}
-                    onEndReached={() => {
-                        if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-                    }}
-                    onEndReachedThreshold={0.5}
-                    ListFooterComponent={() => {
-                        if (!isFetchingNextPage) return null;
-                        return <ActivityIndicator style={{marginVertical: 10}}/>;
-                    }}
-                    refreshControl={
-                        <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()}/>
-                    }
-                    renderItem={({item, index}) => (
-                        <TouchableOpacity
-                            key={item.id}
-                            onPress={() => handleTransactionPress(item)}
-                            style={{ marginBottom: 12 }}
-                        >
-                            <XStack
-                                alignItems="center"
-                                backgroundColor="white"
-                                borderRadius={12}
-                                padding={16}
-                                borderWidth={1}
-                                borderColor={DefaultColor.slate[500]}
-                            >
-                                {/* Content */}
-                                <YStack flex={1} gap={4}>
-                                    <XStack justifyContent="space-between" alignItems="center">
-                                        <Paragraph fontWeight="700" fontSize={16}>
-                                            Rút tiền
-                                        </Paragraph>
-                                        <Paragraph fontWeight="700" fontSize={16} color={getTransactionColor(item.status)}>
-                                            {item.money.toLocaleString('en-US')} VND
-                                        </Paragraph>
-                                    </XStack>
+                  </XStack>
 
-                                    {item.note &&
-                                        <Paragraph
-                                            fontSize={14}
-                                            color="gray"
-                                            numberOfLines={1}
-                                            ellipsizeMode="tail"
-                                        >
-                                            {item.note}
-                                        </Paragraph>
-                                    }
+                  {item.note && (
+                    <Paragraph
+                      fontSize={14}
+                      color="gray"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.note}
+                    </Paragraph>
+                  )}
 
-                                    <XStack
-                                        justifyContent="space-between"
-                                        alignItems="center"
-                                        marginTop={4}
-                                    >
-                                        <Paragraph fontSize={12} color="#9CA3AF">
-                                            {dayjs(item.created_at).format("DD/MM/YYYY HH:mm")}
-                                        </Paragraph>
-                                        <XStack alignItems="center" gap={4}>
-                                            <View
-                                                style={{
-                                                    width: 8,
-                                                    height: 8,
-                                                    borderRadius: 4,
-                                                    backgroundColor: getTransactionColor(item.status),
-                                                }}
-                                            />
-                                            <Paragraph fontSize={12} color={getTransactionColor(item.status)} fontWeight="500">
-                                                {getStatusText(item.status)}
-                                            </Paragraph>
-                                        </XStack>
-                                    </XStack>
-                                </YStack>
-                            </XStack>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={() => (
-                        <YStack flex={1} paddingTop={20} paddingBottom={20} alignItems="center"
-                                justifyContent="center" gap="$4">
-                            <Paragraph fontWeight="bold" theme="alt2">Không có lịch sử giao dịch nào</Paragraph>
-                            <Paragraph textAlign="center" theme="alt2">Hãy nạp hoặc rút tiền để có lịch sử giao dịch của tài khoản</Paragraph>
-                        </YStack>
-                    )}
-                />
+                  <XStack
+                    justifyContent="space-between"
+                    alignItems="center"
+                    marginTop={4}
+                  >
+                    <Paragraph fontSize={12} color="#9CA3AF">
+                      {dayjs(item.created_at).format("DD/MM/YYYY HH:mm")}
+                    </Paragraph>
+                    <XStack alignItems="center" gap={4}>
+                      <View
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 4,
+                          backgroundColor: getTransactionColor(item.status),
+                        }}
+                      />
+                      <Paragraph
+                        fontSize={12}
+                        color={getTransactionColor(item.status)}
+                        fontWeight="500"
+                      >
+                        {getStatusText(item.status)}
+                      </Paragraph>
+                    </XStack>
+                  </XStack>
+                </YStack>
+              </XStack>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={() => (
+            <YStack
+              flex={1}
+              paddingTop={20}
+              paddingBottom={20}
+              alignItems="center"
+              justifyContent="center"
+              gap="$4"
+            >
+              <Paragraph fontWeight="bold" theme="alt2">
+                Không có lịch sử giao dịch nào
+              </Paragraph>
+              <Paragraph textAlign="center" theme="alt2">
+                Hãy nạp hoặc rút tiền để có lịch sử giao dịch của tài khoản
+              </Paragraph>
             </YStack>
-        </YStack>
-    );
+          )}
+        />
+      </YStack>
+    </YStack>
+  );
 }
-
 
 // {/* Transaction Detail Bottom Sheet */}
 // <Sheet
